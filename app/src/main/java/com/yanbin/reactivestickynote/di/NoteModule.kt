@@ -1,5 +1,7 @@
 package com.yanbin.reactivestickynote.di
 
+import com.yanbin.reactivestickynote.data.FirebaseFacade
+import com.yanbin.reactivestickynote.data.FirebaseNoteRepository
 import com.yanbin.reactivestickynote.data.InMemoryNoteRepository
 import com.yanbin.reactivestickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.domain.EditorViewModel
@@ -13,6 +15,8 @@ fun getNoteModule() =
         }
 
         single<NoteRepository> {
-            InMemoryNoteRepository()
+            FirebaseNoteRepository(get())
         }
+
+        single { FirebaseFacade() }
     }

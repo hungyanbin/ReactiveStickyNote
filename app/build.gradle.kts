@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -62,6 +63,9 @@ dependencies {
     implementation(Dependencies.RxJava.rxJava)
     implementation(Dependencies.RxJava.rxAndroid)
     implementation(Dependencies.RxJava.rxKotlin)
+    // Firebase
+    implementation(platform(Dependencies.Firebase.bom))
+    implementation (Dependencies.Firebase.firestore)
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
