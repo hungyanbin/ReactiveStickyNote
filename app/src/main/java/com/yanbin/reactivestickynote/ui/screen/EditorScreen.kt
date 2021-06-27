@@ -20,7 +20,7 @@ fun EditorScreen(
         ) {
             BoardView(
                 viewModel.allNotes.subscribeAsState(initial = emptyList()),
-                viewModel::updateNotePosition
+                viewModel::moveNote
             )
         }
     }

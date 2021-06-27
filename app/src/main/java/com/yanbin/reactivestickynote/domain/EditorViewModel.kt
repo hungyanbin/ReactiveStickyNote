@@ -1,42 +1,37 @@
 package com.yanbin.reactivestickynote.domain
 
 import androidx.lifecycle.ViewModel
+import com.yanbin.reactivestickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
-import com.yanbin.reactivestickynote.model.YBColor
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.random.Random
 
-class EditorViewModel: ViewModel() {
+class EditorViewModel(
+    private val noteRepository: NoteRepository
+): ViewModel() {
 
-    private val noteMap = ConcurrentHashMap<String, Note>()
-    private val allNotesSubject = BehaviorSubject.create<List<Note>>()
+    private val disposableBag = CompositeDisposable()
 
-    val allNotes: Observable<List<Note>> = allNotesSubject.hide()
+    val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
 
-    fun updateNotePosition(note: Note, positionDelta: Position) {
-        val currentNote = noteMap[note.id]  ?: return
-        val newNote = currentNote.copy(position = currentNote.position + positionDelta)
-        setToNoteList(note.id, newNote)
+    fun moveNote(noteId: String, positionDelta: Position) {
+        Observable.just(Pair(noteId, positionDelta))
+            .withLatestFrom(allNotes) { (noteId, positionDelta), notes ->
+                val currentNote = notes.find { note -> note.id == noteId }
+                Optional.ofNullable(currentNote?.copy(position = currentNote.position + positionDelta))
+            }
+            .mapOptional { it }
+            .subscribe { note ->
+                noteRepository.putNote(note)
+            }
+            .addTo(disposableBag)
     }
 
-    private fun setToNoteList(noteId: String, newNote: Note) {
-        noteMap[noteId] = newNote
-        allNotesSubject.onNext(noteMap.elements().toList())
+    override fun onCleared() {
+        disposableBag.clear()
     }
 
-    init {
-        createRandomNote().let { note -> setToNoteList(note.id, note) }
-        createRandomNote().let { note -> setToNoteList(note.id, note) }
-    }
-
-    private fun createRandomNote(): Note {
-        val randomColorIndex = Random.nextInt(YBColor.defaultColors.size)
-        val randomPosition = Position(Random.nextInt(-50, 50).toFloat(), Random.nextInt(-50, 50).toFloat())
-        val randomId = UUID.randomUUID().toString()
-        return Note(randomId, "Hello", randomPosition, YBColor.defaultColors[randomColorIndex])
-    }
 }

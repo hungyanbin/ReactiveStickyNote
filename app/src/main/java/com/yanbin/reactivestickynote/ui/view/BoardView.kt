@@ -13,13 +13,13 @@ import com.yanbin.reactivestickynote.model.Position
 @Composable
 fun BoardView(
     notesState: State<List<Note>>,
-    updateNotePosition: (Note, Position) -> Unit,
+    updateNotePosition: (String, Position) -> Unit,
 ) {
     val notes by notesState
     Box(Modifier.fillMaxSize()) {
         notes.forEach { note ->
             val onNotePositionChanged: (Position) -> Unit = { delta ->
-                updateNotePosition(note, delta)
+                updateNotePosition(note.id, delta)
             }
 
             StickyNote(
