@@ -30,6 +30,11 @@ class EditorViewModel(
             .addTo(disposableBag)
     }
 
+    fun addNewNote() {
+        val newNote = Note.createRandomNote()
+        noteRepository.addNote(newNote)
+    }
+
     override fun onCleared() {
         disposableBag.clear()
     }

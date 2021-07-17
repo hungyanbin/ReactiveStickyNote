@@ -52,6 +52,10 @@ class FirebaseNoteRepository(
             }
     }
 
+    override fun addNote(note: Note) {
+        setNoteDocument(note)
+    }
+
     override fun putNote(note: Note) {
         updatingNoteSubject.onNext(Optional.of(note))
     }

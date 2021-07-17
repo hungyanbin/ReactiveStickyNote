@@ -17,6 +17,10 @@ class InMemoryNoteRepository: NoteRepository {
         notes.onNext(noteMap.elements().toList())
     }
 
+    override fun addNote(note: Note) {
+        noteMap[note.id] = note
+    }
+
     init {
         Note.createRandomNote().let { note -> noteMap[note.id] = note }
         Note.createRandomNote().let { note -> noteMap[note.id] = note }
