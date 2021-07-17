@@ -26,7 +26,9 @@ import com.yanbin.reactivestickynote.model.Position
 fun StickyNote(
     modifier: Modifier = Modifier,
     onPositionChanged: (Position) -> Unit = {},
+    onClick: (Note) -> Unit,
     note: Note,
+    selected: Boolean,
 ) {
     val offset by animateIntOffsetAsState(
         targetValue = IntOffset(
@@ -35,13 +37,23 @@ fun StickyNote(
         )
     )
 
+    val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show ->
+        if (show) {
+            this.border(2.dp, Color.Black, MaterialTheme.shapes.medium)
+        } else {
+            this
+        }.padding(8.dp)
+    }
+
     Surface(
         modifier.offset { offset }
-            .size(108.dp, 108.dp),
+            .size(108.dp, 108.dp)
+            .highlightBorder(selected),
         color = Color(note.color.color),
         elevation = 8.dp
     ) {
         Column(modifier = Modifier
+            .clickable { onClick(note) }
             .pointerInput(note.id) {
                 detectDragGestures { change, dragAmount ->
                     change.consumeAllChanges()
