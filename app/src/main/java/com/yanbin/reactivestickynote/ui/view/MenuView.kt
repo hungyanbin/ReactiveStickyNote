@@ -29,7 +29,8 @@ fun MenuView(
     modifier: Modifier = Modifier,
     selectedColor: YBColor,
     onDeleteClicked: () -> Unit,
-    onColorSelected: (YBColor) -> Unit
+    onColorSelected: (YBColor) -> Unit,
+    onTextClicked: () -> Unit
 ) {
     var expended by remember {
         mutableStateOf(false)
@@ -47,7 +48,7 @@ fun MenuView(
                 Icon(painter = painter, contentDescription = "Delete")
             }
 
-            IconButton(onClick = {} ) {
+            IconButton(onClick = onTextClicked ) {
                 val painter = painterResource(id = R.drawable.ic_text)
                 Icon(painter = painter, contentDescription = "Edit text")
             }

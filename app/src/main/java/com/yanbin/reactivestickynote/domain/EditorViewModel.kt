@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
 class EditorViewModel(
@@ -20,12 +21,14 @@ class EditorViewModel(
     private val disposableBag = CompositeDisposable()
     private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
     private val selectingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
+    private val openEditTextSubject = PublishSubject.create<String>()
 
     val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
     val selectingNote: Observable<Optional<Note>> = selectingNoteSubject.hide()
     val selectingColor: Observable<YBColor> = selectingNote
         .mapOptional { it }
         .map { it.color }
+    val openEditTextScreen: Observable<String> = openEditTextSubject.hide()
 
     init {
         Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
@@ -84,6 +87,12 @@ class EditorViewModel(
             .ifPresent { note ->
                 noteRepository.putNote(note)
             }
+    }
+
+    fun onEditTextClicked() {
+        selectingNoteSubject.value.ifPresent { note ->
+            openEditTextSubject.onNext(note.id)
+        }
     }
 
     override fun onCleared() {

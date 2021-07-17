@@ -23,13 +23,20 @@ import com.yanbin.reactivestickynote.domain.EditorViewModel
 import com.yanbin.reactivestickynote.model.YBColor
 import com.yanbin.reactivestickynote.ui.view.BoardView
 import com.yanbin.reactivestickynote.ui.view.MenuView
+import com.yanbin.utils.subscribeBy
+import com.yanbin.utils.toMain
 import java.util.*
 
 @ExperimentalAnimationApi
 @Composable
 fun EditorScreen(
     viewModel: EditorViewModel,
+    openEditTextScreen: (String) -> Unit
 ) {
+    viewModel.openEditTextScreen
+        .toMain()
+        .subscribeBy (onNext = openEditTextScreen)
+
     Surface(color = MaterialTheme.colors.background) {
         Box(
             Modifier.fillMaxSize()
@@ -69,7 +76,8 @@ fun EditorScreen(
                 MenuView(
                     selectedColor = selectingColor,
                     onDeleteClicked = viewModel::onDeleteClicked,
-                    onColorSelected = viewModel::onColorSelected
+                    onColorSelected = viewModel::onColorSelected,
+                    onTextClicked = viewModel::onEditTextClicked
                 )
             }
 

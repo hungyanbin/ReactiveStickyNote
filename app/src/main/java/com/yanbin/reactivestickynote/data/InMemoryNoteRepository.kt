@@ -3,6 +3,7 @@ package com.yanbin.reactivestickynote.data
 import com.yanbin.reactivestickynote.model.Note
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryNoteRepository: NoteRepository {
@@ -23,6 +24,12 @@ class InMemoryNoteRepository: NoteRepository {
 
     override fun deleteNote(noteId: String) {
         noteMap.remove(noteId)
+    }
+
+    override fun getNoteById(id: String): Observable<Note> {
+        return notes.map { notes ->
+            Optional.ofNullable(notes.find { note -> note.id == id })
+        }.mapOptional { it }
     }
 
     init {
