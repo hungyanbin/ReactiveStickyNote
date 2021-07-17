@@ -26,13 +26,14 @@ import com.yanbin.reactivestickynote.model.YBColor
 
 @Composable
 fun MenuView(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedColor: YBColor,
+    onDeleteClicked: () -> Unit,
+    onColorSelected: (YBColor) -> Unit
 ) {
     var expended by remember {
         mutableStateOf(false)
     }
-
-    val selectedColor = YBColor.HotPink
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -41,7 +42,7 @@ fun MenuView(
     ) {
 
         Row {
-            IconButton(onClick = {  } ) {
+            IconButton(onClick = onDeleteClicked ) {
                 val painter = painterResource(id = R.drawable.ic_delete)
                 Icon(painter = painter, contentDescription = "Delete")
             }
@@ -59,8 +60,8 @@ fun MenuView(
                 DropdownMenu(expanded = expended, onDismissRequest = { expended = false }) {
                     for (color in YBColor.defaultColors) {
                         DropdownMenuItem(onClick = {
+                            onColorSelected(color)
                             expended = false
-                            {}
                         }) {
                             Box(modifier = Modifier
                                 .size(24.dp)

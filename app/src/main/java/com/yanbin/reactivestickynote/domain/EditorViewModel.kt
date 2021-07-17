@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
+import com.yanbin.reactivestickynote.model.YBColor
 import com.yanbin.utils.fromComputation
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -17,14 +18,24 @@ class EditorViewModel(
 ): ViewModel() {
 
     private val disposableBag = CompositeDisposable()
+    private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
+    private val selectingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
 
     val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
+    val selectingNote: Observable<Optional<Note>> = selectingNoteSubject.hide()
+    val selectingColor: Observable<YBColor> = selectingNote
+        .mapOptional { it }
+        .map { it.color }
 
-    private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
-
-    val selectingNote: Observable<Optional<Note>> = Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
-        Optional.ofNullable<Note>(notes.find { note -> note.id == id })
-    }.fromComputation()
+    init {
+        Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
+            Optional.ofNullable<Note>(notes.find { note -> note.id == id })
+        }.fromComputation()
+            .subscribe { optNote ->
+                selectingNoteSubject.onNext(optNote)
+            }
+            .addTo(disposableBag)
+    }
 
     fun moveNote(noteId: String, positionDelta: Position) {
         Observable.just(Pair(noteId, positionDelta))
@@ -55,6 +66,24 @@ class EditorViewModel(
 
     fun tapCanvas() {
         selectingNoteIdSubject.onNext("")
+    }
+
+    fun onDeleteClicked() {
+        val selectingNoteId = selectingNoteIdSubject.value
+        if (selectingNoteId.isNotEmpty()) {
+            noteRepository.deleteNote(selectingNoteId)
+            selectingNoteIdSubject.onNext("")
+        }
+    }
+
+    fun onColorSelected(color: YBColor) {
+        val optSelectingNote = selectingNoteSubject.value
+
+        optSelectingNote
+            .map { note -> note.copy(color = color) }
+            .ifPresent { note ->
+                noteRepository.putNote(note)
+            }
     }
 
     override fun onCleared() {

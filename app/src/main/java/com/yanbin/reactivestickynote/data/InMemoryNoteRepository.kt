@@ -21,6 +21,10 @@ class InMemoryNoteRepository: NoteRepository {
         noteMap[note.id] = note
     }
 
+    override fun deleteNote(noteId: String) {
+        noteMap.remove(noteId)
+    }
+
     init {
         Note.createRandomNote().let { note -> noteMap[note.id] = note }
         Note.createRandomNote().let { note -> noteMap[note.id] = note }

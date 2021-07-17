@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
 import com.yanbin.reactivestickynote.domain.EditorViewModel
+import com.yanbin.reactivestickynote.model.YBColor
 import com.yanbin.reactivestickynote.ui.view.BoardView
 import com.yanbin.reactivestickynote.ui.view.MenuView
 import java.util.*
@@ -38,6 +39,7 @@ fun EditorScreen(
         ) {
             val selectedNoteState = viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
             val selectedNote by selectedNoteState
+            val selectingColor by viewModel.selectingColor.subscribeAsState(initial = YBColor.Aquamarine)
 
             BoardView(
                 viewModel.allNotes.subscribeAsState(initial = emptyList()),
@@ -64,7 +66,11 @@ fun EditorScreen(
                 visible = selectedNote.isPresent,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                MenuView()
+                MenuView(
+                    selectedColor = selectingColor,
+                    onDeleteClicked = viewModel::onDeleteClicked,
+                    onColorSelected = viewModel::onColorSelected
+                )
             }
 
         }

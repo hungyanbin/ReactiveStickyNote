@@ -60,6 +60,12 @@ class FirebaseNoteRepository(
         updatingNoteSubject.onNext(Optional.of(note))
     }
 
+    override fun deleteNote(noteId: String) {
+        firestore.collection(COLLECTION_NOTES)
+            .document(noteId)
+            .delete()
+    }
+
     private fun onSnapshotUpdated(snapshot: QuerySnapshot) {
         val allNotes = snapshot
             .map { document -> documentToNotes(document) }
