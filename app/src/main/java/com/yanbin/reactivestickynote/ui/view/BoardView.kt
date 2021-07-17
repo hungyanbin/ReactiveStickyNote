@@ -3,6 +3,7 @@ package com.yanbin.reactivestickynote.ui.view
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,13 +30,15 @@ fun BoardView(
 
             val selected = selectedNote.filter { it.id == note.id }.isPresent
 
-            StickyNote(
-                modifier = Modifier.align(Alignment.Center),
-                note = note,
-                selected = selected,
-                onPositionChanged = onNotePositionChanged,
-                onClick = onNoteClicked
-            )
+            ReusableContent(key = note.id) {
+                StickyNote(
+                    modifier = Modifier.align(Alignment.Center),
+                    note = note,
+                    selected = selected,
+                    onPositionChanged = onNotePositionChanged,
+                    onClick = onNoteClicked
+                )
+            }
         }
     }
 }
