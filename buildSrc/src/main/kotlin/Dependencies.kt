@@ -39,7 +39,7 @@ object Dependencies {
 object Version {
     const val kotlin = "1.5.10"
     const val jUnit5 = "5.3.1"
-    const val compose = "1.0.0-beta08"
+    const val compose = "1.0.0"
     const val koin = "3.0.2"
 
     object Android {
