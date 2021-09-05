@@ -52,8 +52,14 @@ class FirebaseNoteRepository(
             }
     }
 
+    override fun getAllVisibleNoteIds(): Observable<List<String>> {
+        // TODO use better way to get id
+        return getAllNotes()
+            .map { notes -> notes.map { it.id } }
+    }
+
     override fun getNoteById(id: String): Observable<Note> {
-        return allNotesSubject.map { notes ->
+        return getAllNotes().map { notes ->
             Optional.ofNullable(notes.find { note -> note.id == id })
         }.mapOptional { it }
     }

@@ -32,6 +32,10 @@ class InMemoryNoteRepository: NoteRepository {
         }.mapOptional { it }
     }
 
+    override fun getAllVisibleNoteIds(): Observable<List<String>> {
+        return notes.map { notes -> notes.map { it.id } }
+    }
+
     init {
         Note.createRandomNote().let { note -> noteMap[note.id] = note }
         Note.createRandomNote().let { note -> noteMap[note.id] = note }

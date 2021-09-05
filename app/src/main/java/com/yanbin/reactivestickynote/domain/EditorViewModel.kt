@@ -15,87 +15,50 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
 class EditorViewModel(
-    private val noteRepository: NoteRepository
+    private val noteEditor: NoteEditor
 ): ViewModel() {
 
     private val disposableBag = CompositeDisposable()
-    private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
-    private val selectingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
-    private val openEditTextSubject = PublishSubject.create<String>()
 
-    val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
-    val selectingNote: Observable<Optional<Note>> = selectingNoteSubject.hide()
-    val selectingColor: Observable<YBColor> = selectingNote
-        .mapOptional { it }
-        .map { it.color }
-    val openEditTextScreen: Observable<String> = openEditTextSubject.hide()
+    val allNotes: Observable<List<Note>> = noteEditor.allNotes
+    val selectingNote: Observable<Optional<Note>> = noteEditor.selectedNote
+    val selectingColor: Observable<YBColor> = noteEditor.contextMenu.selectedColor
+    val openEditTextScreen: Observable<String> = noteEditor.openEditTextScreen
 
     init {
-        Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
-            Optional.ofNullable<Note>(notes.find { note -> note.id == id })
-        }.fromComputation()
-            .subscribe { optNote ->
-                selectingNoteSubject.onNext(optNote)
-            }
-            .addTo(disposableBag)
+        noteEditor.start()
     }
 
     fun moveNote(noteId: String, positionDelta: Position) {
-        Observable.just(Pair(noteId, positionDelta))
-            .withLatestFrom(allNotes) { (noteId, positionDelta), notes ->
-                val currentNote = notes.find { note -> note.id == noteId }
-                Optional.ofNullable(currentNote?.copy(position = currentNote.position + positionDelta))
-            }
-            .mapOptional { it }
-            .subscribe { note ->
-                noteRepository.putNote(note)
-            }
-            .addTo(disposableBag)
+        noteEditor.moveNote(noteId, positionDelta)
     }
 
     fun addNewNote() {
-        val newNote = Note.createRandomNote()
-        noteRepository.addNote(newNote)
+        noteEditor.addNewNote()
     }
 
     fun tapNote(note: Note) {
-        val selectingNoteId = selectingNoteIdSubject.value
-        if (selectingNoteId == note.id) {
-            selectingNoteIdSubject.onNext("")
-        } else {
-            selectingNoteIdSubject.onNext(note.id)
-        }
+        noteEditor.selectNote(note.id)
     }
 
     fun tapCanvas() {
-        selectingNoteIdSubject.onNext("")
+        noteEditor.clearSelection()
     }
 
     fun onDeleteClicked() {
-        val selectingNoteId = selectingNoteIdSubject.value
-        if (selectingNoteId.isNotEmpty()) {
-            noteRepository.deleteNote(selectingNoteId)
-            selectingNoteIdSubject.onNext("")
-        }
+        noteEditor.contextMenu.onDeleteClicked()
     }
 
     fun onColorSelected(color: YBColor) {
-        val optSelectingNote = selectingNoteSubject.value
-
-        optSelectingNote
-            .map { note -> note.copy(color = color) }
-            .ifPresent { note ->
-                noteRepository.putNote(note)
-            }
+        noteEditor.contextMenu.onColorSelected(color)
     }
 
     fun onEditTextClicked() {
-        selectingNoteSubject.value.ifPresent { note ->
-            openEditTextSubject.onNext(note.id)
-        }
+        noteEditor.contextMenu.onEditTextClicked()
     }
 
     override fun onCleared() {
+        noteEditor.stop()
         disposableBag.clear()
     }
 
