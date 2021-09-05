@@ -14,10 +14,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class FirebaseNoteRepository(
-    firebaseFacade: FirebaseFacade
-): NoteRepository {
-    private val firestore = firebaseFacade.getFirestore()
+class FirebaseNoteRepository : NoteRepository {
+    private val firestore = FirebaseFirestore.getInstance()
     private val allNotesSubject = BehaviorSubject.create<List<Note>>()
     private val updatingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
 
@@ -54,8 +52,14 @@ class FirebaseNoteRepository(
             }
     }
 
+    override fun getAllVisibleNoteIds(): Observable<List<String>> {
+        // TODO use better way to get id
+        return getAllNotes()
+            .map { notes -> notes.map { it.id } }
+    }
+
     override fun getNoteById(id: String): Observable<Note> {
-        return allNotesSubject.map { notes ->
+        return getAllNotes().map { notes ->
             Optional.ofNullable(notes.find { note -> note.id == id })
         }.mapOptional { it }
     }

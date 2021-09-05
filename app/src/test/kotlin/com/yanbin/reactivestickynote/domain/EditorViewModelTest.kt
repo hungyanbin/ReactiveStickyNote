@@ -8,27 +8,40 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.rxjava3.core.Observable
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import java.util.*
 
 internal class EditorViewModelTest {
 
     private val noteRepository = mockk<NoteRepository>(relaxed = true)
+    private val noteEditor = NoteEditor(noteRepository)
+
+    @Before
+    fun setUp() {
+        noteEditor.start()
+    }
+
+    @After
+    fun tearDown() {
+        noteEditor.stop()
+    }
 
     @Test
     fun loadStickyNoteTest() {
         every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val testObserver = viewModel.allNotes.test()
         testObserver.assertValue(fakeNotes())
     }
 
     @Test
     fun `move note 1 with delta position (40, 40), expect noteRepository put Note with position (40, 40)`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
 
         viewModel.moveNote("1", Position(40f, 40f))
 
@@ -39,9 +52,9 @@ internal class EditorViewModelTest {
 
     @Test
     fun `move note 2 with delta position (40, 40), expect noteRepository put Note with position (50, 50)`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("2") } returns Observable.just(fakeNotes()[1])
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
 
         viewModel.moveNote("2", Position(40f, 40f))
 
@@ -52,9 +65,7 @@ internal class EditorViewModelTest {
 
     @Test
     fun `addNewNote called expect noteRepository add new note`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(emptyList())
-
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         viewModel.addNewNote()
 
         verify { noteRepository.createNote(any()) }
@@ -62,9 +73,9 @@ internal class EditorViewModelTest {
 
     @Test
     fun `tapNote called expect select the tapped note`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val selectingNoteObserver = viewModel.selectingNote.test()
         val tappedNote = fakeNotes()[0]
         viewModel.tapNote(tappedNote)
@@ -75,9 +86,9 @@ internal class EditorViewModelTest {
 
     @Test
     fun `tapCanvas called expect clear the selected note`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val selectingNoteObserver = viewModel.selectingNote.test()
         val tappedNote = fakeNotes()[0]
         viewModel.tapNote(tappedNote)
@@ -88,9 +99,9 @@ internal class EditorViewModelTest {
 
     @Test
     fun `onDeleteClicked called expect clear the selected note`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val selectingNoteObserver = viewModel.selectingNote.test()
         val tappedNote = fakeNotes()[0]
         viewModel.tapNote(tappedNote)
@@ -101,9 +112,7 @@ internal class EditorViewModelTest {
 
     @Test
     fun `onDeleteClicked called expect delete the note in noteRepository`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
-
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val tappedNote = fakeNotes()[0]
         viewModel.tapNote(tappedNote)
         viewModel.onDeleteClicked()
@@ -113,9 +122,9 @@ internal class EditorViewModelTest {
 
     @Test
     fun `onEditTextClicked called expect openEditTextScreen`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val openEditTextScreenObserver = viewModel.openEditTextScreen.test()
         val tappedNote = fakeNotes()[0]
         viewModel.tapNote(tappedNote)
@@ -126,9 +135,9 @@ internal class EditorViewModelTest {
 
     @Test
     fun `tapNote called expect showing correct selectingColor`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val selectingColorObserver = viewModel.selectingColor.test()
         val tappedNote = fakeNotes()[0]
         viewModel.tapNote(tappedNote)
@@ -138,10 +147,10 @@ internal class EditorViewModelTest {
 
     @Test
     fun `onColorSelected called expect update note with selected color`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
         val selectedColor = YBColor.PaleCanary
 
-        val viewModel = EditorViewModel(noteRepository)
+        val viewModel = EditorViewModel(noteEditor)
         val tappedNote = fakeNotes()[0]
         viewModel.tapNote(tappedNote)
         viewModel.onColorSelected(selectedColor)
