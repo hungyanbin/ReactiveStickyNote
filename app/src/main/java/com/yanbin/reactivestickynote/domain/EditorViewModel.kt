@@ -18,12 +18,11 @@ class EditorViewModel(
     private val noteEditor: NoteEditor
 ): ViewModel() {
 
-    private val disposableBag = CompositeDisposable()
-
     val allVisibleNoteIds: Observable<List<String>> = noteEditor.allVisibleNotes
     val selectingNote: Observable<Optional<Note>> = noteEditor.selectedNote
-    val selectingColor: Observable<YBColor> = noteEditor.contextMenu.selectedColor
     val openEditTextScreen: Observable<String> = noteEditor.openEditTextScreen
+    val showContextMenu = noteEditor.showContextMenu
+    val showAddButton = noteEditor.showAddButton
 
     init {
         noteEditor.start()
@@ -45,23 +44,10 @@ class EditorViewModel(
         noteEditor.clearSelection()
     }
 
-    fun onDeleteClicked() {
-        noteEditor.contextMenu.onDeleteClicked()
-    }
-
-    fun onColorSelected(color: YBColor) {
-        noteEditor.contextMenu.onColorSelected(color)
-    }
-
-    fun onEditTextClicked() {
-        noteEditor.contextMenu.onEditTextClicked()
-    }
-
     fun getNoteById(id: String) = noteEditor.getNoteById(id)
 
     override fun onCleared() {
         noteEditor.stop()
-        disposableBag.clear()
     }
 
 }

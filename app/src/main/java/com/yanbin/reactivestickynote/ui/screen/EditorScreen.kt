@@ -23,6 +23,7 @@ import com.yanbin.reactivestickynote.domain.EditorViewModel
 import com.yanbin.reactivestickynote.model.YBColor
 import com.yanbin.reactivestickynote.ui.view.BoardView
 import com.yanbin.reactivestickynote.ui.view.MenuView
+import com.yanbin.reactivestickynote.ui.view.StatefulMenuView
 import com.yanbin.utils.subscribeBy
 import com.yanbin.utils.toMain
 import java.util.*
@@ -39,20 +40,20 @@ fun EditorScreen(
 
     Surface(color = MaterialTheme.colors.background) {
         Box(
-            Modifier.fillMaxSize()
+            Modifier
+                .fillMaxSize()
                 .pointerInput("Editor") {
                     detectTapGestures { viewModel.tapCanvas() }
                 }
         ) {
-            val selectedNoteState = viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
-            val selectedNote by selectedNoteState
-            val selectingColor by viewModel.selectingColor.subscribeAsState(initial = YBColor.Aquamarine)
+            val showContextMenu by viewModel.showContextMenu.subscribeAsState(initial = false)
+            val showAddButton by viewModel.showAddButton.subscribeAsState(initial = true)
             val noteIdsState by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
 
             BoardView(noteIdsState)
 
             AnimatedVisibility(
-                visible = !selectedNote.isPresent,
+                visible = showAddButton,
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {
                 FloatingActionButton(
@@ -66,15 +67,10 @@ fun EditorScreen(
             }
 
             AnimatedVisibility(
-                visible = selectedNote.isPresent,
+                visible = showContextMenu,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                MenuView(
-                    selectedColor = selectingColor,
-                    onDeleteClicked = viewModel::onDeleteClicked,
-                    onColorSelected = viewModel::onColorSelected,
-                    onTextClicked = viewModel::onEditTextClicked
-                )
+                StatefulMenuView()
             }
 
         }

@@ -18,7 +18,7 @@ data class Note(
         }
 
         fun createEmptyNote(id: String): Note {
-            return Note(id, "", Position(Float.MAX_VALUE, Float.MAX_VALUE), YBColor.HotPink)
+            return Note(id, "", Position(0f, Float.MAX_VALUE), YBColor.HotPink)
         }
     }
 }

@@ -3,6 +3,7 @@ package com.yanbin.reactivestickynote.di
 import com.yanbin.reactivestickynote.data.FirebaseFacade
 import com.yanbin.reactivestickynote.data.FirebaseNoteRepository
 import com.yanbin.reactivestickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.domain.ContextMenuViewModel
 import com.yanbin.reactivestickynote.domain.EditTextViewModel
 import com.yanbin.reactivestickynote.domain.EditorViewModel
 import com.yanbin.reactivestickynote.domain.NoteEditor
@@ -14,6 +15,12 @@ fun getNoteModule() =
         viewModel {
             EditorViewModel(
                 noteEditor = get()
+            )
+        }
+
+        viewModel {
+            ContextMenuViewModel(
+                contextMenu = get<NoteEditor>().contextMenu
             )
         }
 
