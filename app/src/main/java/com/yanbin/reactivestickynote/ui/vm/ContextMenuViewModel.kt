@@ -1,6 +1,7 @@
-package com.yanbin.reactivestickynote.domain
+package com.yanbin.reactivestickynote.ui.vm
 
 import androidx.lifecycle.ViewModel
+import com.yanbin.reactivestickynote.domain.ContextMenu
 import com.yanbin.reactivestickynote.model.YBColor
 
 class ContextMenuViewModel(

@@ -24,7 +24,7 @@ class NoteEditor(
 
     // State
     val selectedNote: Observable<Optional<Note>> = selectedNoteId
-        .flatMap { optId ->
+        .switchMap { optId ->
             if (optId.isPresent) {
                 noteRepository.getNoteById(optId.get())
                     .map { Optional.ofNullable(it) }

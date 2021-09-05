@@ -2,9 +2,9 @@ package com.yanbin.reactivestickynote.di
 
 import com.yanbin.reactivestickynote.data.FirebaseNoteRepository
 import com.yanbin.reactivestickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.domain.ContextMenuViewModel
+import com.yanbin.reactivestickynote.ui.vm.ContextMenuViewModel
 import com.yanbin.reactivestickynote.domain.EditTextViewModel
-import com.yanbin.reactivestickynote.domain.EditorViewModel
+import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import com.yanbin.reactivestickynote.domain.NoteEditor
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
