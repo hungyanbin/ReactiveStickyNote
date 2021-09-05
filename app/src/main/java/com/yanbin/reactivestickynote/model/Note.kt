@@ -16,5 +16,9 @@ data class Note(
             val randomId = UUID.randomUUID().toString()
             return Note(randomId, "Hello", randomPosition, YBColor.defaultColors[randomColorIndex])
         }
+
+        fun createEmptyNote(id: String): Note {
+            return Note(id, "", Position(Float.MAX_VALUE, Float.MAX_VALUE), YBColor.HotPink)
+        }
     }
 }

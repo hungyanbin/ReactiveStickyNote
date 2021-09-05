@@ -18,23 +18,13 @@ internal class EditorViewModelTest {
     private val noteRepository = mockk<NoteRepository>(relaxed = true)
     private val noteEditor = NoteEditor(noteRepository)
 
-    @Before
-    fun setUp() {
-        noteEditor.start()
-    }
-
-    @After
-    fun tearDown() {
-        noteEditor.stop()
-    }
-
     @Test
     fun loadStickyNoteTest() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        every { noteRepository.getAllVisibleNoteIds() } returns Observable.just(fakeNotes().map { it.id })
 
         val viewModel = EditorViewModel(noteEditor)
-        val testObserver = viewModel.allNotes.test()
-        testObserver.assertValue(fakeNotes())
+        val testObserver = viewModel.allVisibleNoteIds.test()
+        testObserver.assertValue(fakeNotes().map { it.id })
     }
 
     @Test

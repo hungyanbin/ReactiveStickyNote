@@ -13,14 +13,40 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import com.yanbin.reactivestickynote.domain.EditorViewModel
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
+
+@Composable
+fun StatefulStickyNote(
+    id: String,
+    modifier: Modifier = Modifier,
+) {
+    val editorViewModel by LocalViewModelStoreOwner.current!!.viewModel<EditorViewModel>()
+    val onPositionChanged: (Position) -> Unit = { delta ->
+        editorViewModel.moveNote(id, delta)
+    }
+    val note by editorViewModel.getNoteById(id).subscribeAsState(initial = Note.createEmptyNote(id))
+    val selectedNote by editorViewModel.selectingNote.subscribeAsState(initial = Optional.empty())
+    val selected = selectedNote.filter { it.id == id }.isPresent
+
+    StickyNote(
+        modifier = modifier,
+        onPositionChanged = onPositionChanged,
+        onClick = editorViewModel::tapNote,
+        note = note,
+        selected = selected)
+}
 
 private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show ->
     if (show) {

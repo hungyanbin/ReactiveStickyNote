@@ -19,14 +19,15 @@ class EditorViewModel(
 ): ViewModel() {
 
     private val disposableBag = CompositeDisposable()
-    private val selectingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
 
-    val allNotes = noteEditor.allNotes
     val selectingNote: Observable<Optional<Note>> = noteEditor.selectedNote
-    val selectingColor: Observable<YBColor> = selectingNote
-        .mapOptional { it }
-        .map { it.color }
+    val selectingColor: Observable<YBColor> = noteEditor.contextMenu.selectedColor
     val openEditTextScreen: Observable<Note> = noteEditor.openEditTextScreen
+    val allVisibleNoteIds = noteEditor.allVisibleNotes
+
+    init {
+        noteEditor.start()
+    }
 
     fun moveNote(noteId: String, positionDelta: Position) {
         noteEditor.moveNote(noteId, positionDelta)
@@ -55,6 +56,8 @@ class EditorViewModel(
     fun onEditTextClicked() {
         noteEditor.contextMenu.onEditTextClicked()
     }
+
+    fun getNoteById(id: String) = noteEditor.getNoteById(id)
 
     override fun onCleared() {
         noteEditor.stop()
