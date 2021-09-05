@@ -59,6 +59,7 @@ class FirebaseNoteRepository : NoteRepository {
     }
 
     override fun getNoteById(id: String): Observable<Note> {
+        // TODO use better way to get note
         return getAllNotes().map { notes ->
             Optional.ofNullable(notes.find { note -> note.id == id })
         }.mapOptional { it }

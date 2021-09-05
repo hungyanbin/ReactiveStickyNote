@@ -62,7 +62,13 @@ class NoteEditor(
     }
 
     fun selectNote(noteId: String) {
-        selectedNoteId.onNext(Optional.of(noteId))
+        if (selectedNoteId.value.isPresent && selectedNoteId.value.get() == noteId) {
+            clearSelection()
+        } else {
+            selectedNoteId.onNext(Optional.of(noteId))
+            _showAddButton.onNext(false)
+            _showContextMenu.onNext(true)
+        }
     }
 
     fun clearSelection() {

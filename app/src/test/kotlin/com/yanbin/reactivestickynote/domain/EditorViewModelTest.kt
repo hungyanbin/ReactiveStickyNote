@@ -87,69 +87,6 @@ internal class EditorViewModelTest {
         selectingNoteObserver.assertValueAt(2, Optional.empty())
     }
 
-    @Test
-    fun `onDeleteClicked called expect clear the selected note`() {
-        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
-
-        val viewModel = EditorViewModel(noteEditor)
-        val selectingNoteObserver = viewModel.selectingNote.test()
-        val tappedNote = fakeNotes()[0]
-        viewModel.tapNote(tappedNote)
-        viewModel.onDeleteClicked()
-
-        selectingNoteObserver.assertValueAt(2, Optional.empty())
-    }
-
-    @Test
-    fun `onDeleteClicked called expect delete the note in noteRepository`() {
-        val viewModel = EditorViewModel(noteEditor)
-        val tappedNote = fakeNotes()[0]
-        viewModel.tapNote(tappedNote)
-        viewModel.onDeleteClicked()
-
-        verify { noteRepository.deleteNote(tappedNote.id) }
-    }
-
-    @Test
-    fun `onEditTextClicked called expect openEditTextScreen`() {
-        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
-
-        val viewModel = EditorViewModel(noteEditor)
-        val openEditTextScreenObserver = viewModel.openEditTextScreen.test()
-        val tappedNote = fakeNotes()[0]
-        viewModel.tapNote(tappedNote)
-        viewModel.onEditTextClicked()
-
-        openEditTextScreenObserver.assertValue(tappedNote)
-    }
-
-    @Test
-    fun `tapNote called expect showing correct selectingColor`() {
-        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
-
-        val viewModel = EditorViewModel(noteEditor)
-        val selectingColorObserver = viewModel.selectingColor.test()
-        val tappedNote = fakeNotes()[0]
-        viewModel.tapNote(tappedNote)
-
-        selectingColorObserver.assertValue(tappedNote.color)
-    }
-
-    @Test
-    fun `onColorSelected called expect update note with selected color`() {
-        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
-        val selectedColor = YBColor.PaleCanary
-
-        val viewModel = EditorViewModel(noteEditor)
-        val tappedNote = fakeNotes()[0]
-        viewModel.tapNote(tappedNote)
-        viewModel.onColorSelected(selectedColor)
-
-        verify { noteRepository.putNote(
-            Note(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.PaleCanary)
-        ) }
-    }
-
     private fun fakeNotes(): List<Note> {
         return listOf(
             Note(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine),
