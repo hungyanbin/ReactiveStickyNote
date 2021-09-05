@@ -20,7 +20,7 @@ class EditorViewModel(
 
     private val disposableBag = CompositeDisposable()
 
-    val allNotes: Observable<List<Note>> = noteEditor.allNotes
+    val allVisibleNoteIds: Observable<List<String>> = noteEditor.allVisibleNotes
     val selectingNote: Observable<Optional<Note>> = noteEditor.selectedNote
     val selectingColor: Observable<YBColor> = noteEditor.contextMenu.selectedColor
     val openEditTextScreen: Observable<String> = noteEditor.openEditTextScreen
@@ -56,6 +56,8 @@ class EditorViewModel(
     fun onEditTextClicked() {
         noteEditor.contextMenu.onEditTextClicked()
     }
+
+    fun getNoteById(id: String) = noteEditor.getNoteById(id)
 
     override fun onCleared() {
         noteEditor.stop()

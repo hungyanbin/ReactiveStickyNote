@@ -47,13 +47,9 @@ fun EditorScreen(
             val selectedNoteState = viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
             val selectedNote by selectedNoteState
             val selectingColor by viewModel.selectingColor.subscribeAsState(initial = YBColor.Aquamarine)
+            val noteIdsState by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
 
-            BoardView(
-                viewModel.allNotes.subscribeAsState(initial = emptyList()),
-                selectedNoteState,
-                viewModel::moveNote,
-                viewModel::tapNote
-            )
+            BoardView(noteIdsState)
 
             AnimatedVisibility(
                 visible = !selectedNote.isPresent,

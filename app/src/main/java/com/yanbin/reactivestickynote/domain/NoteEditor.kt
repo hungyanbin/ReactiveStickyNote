@@ -33,9 +33,6 @@ class NoteEditor(
             }
         }
 
-    @Deprecated("Will remove later")
-    val allNotes = noteRepository.getAllNotes()
-
     val allVisibleNotes: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
     val showAddButton: Observable<Boolean> = _showAddButton.hide()
