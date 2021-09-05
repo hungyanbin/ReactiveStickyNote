@@ -11,8 +11,6 @@ class InMemoryNoteRepository: NoteRepository {
     private val notes = BehaviorSubject.createDefault(emptyList<Note>())
     private val noteMap = ConcurrentHashMap<String, Note>()
 
-    override fun getAllNotes(): Observable<List<Note>> = notes.hide()
-
     override fun putNote(note: Note) {
         noteMap[note.id] = note
         notes.onNext(noteMap.elements().toList())

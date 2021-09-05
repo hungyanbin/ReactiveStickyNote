@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.yanbin.reactivestickynote.domain.EditTextViewModel
-import com.yanbin.reactivestickynote.domain.EditorViewModel
+import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import com.yanbin.reactivestickynote.ui.screen.EditTextScreen
 import com.yanbin.reactivestickynote.ui.screen.EditorScreen
 import com.yanbin.reactivestickynote.ui.screen.Screen

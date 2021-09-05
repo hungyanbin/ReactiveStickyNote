@@ -1,14 +1,13 @@
 package com.yanbin.reactivestickynote.data
 
-import com.google.firebase.firestore.QueryDocumentSnapshot
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
 import com.yanbin.reactivestickynote.model.YBColor
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.Subject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -16,8 +15,11 @@ class FirebaseNoteRepository(
     firebaseFacade: FirebaseFacade
 ): NoteRepository {
     private val firestore = firebaseFacade.getFirestore()
-    private val allNotesSubject = BehaviorSubject.create<List<Note>>()
+    private val allNoteIdsSubject = BehaviorSubject.create<List<String>>()
     private val updatingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
+
+    private val registrations = hashMapOf<String, ListenerRegistration>()
+    private val noteSubjects = hashMapOf<String, Subject<Note>>()
 
     private val query = firestore.collection(COLLECTION_NOTES)
         .limit(100)
@@ -42,27 +44,38 @@ class FirebaseNoteRepository(
             }
     }
 
-    override fun getAllNotes(): Observable<List<Note>> {
-        return Observables.combineLatest(updatingNoteSubject, allNotesSubject)
-            .map { (optNote, allNotes) ->
-                optNote.map { note ->
-                    val noteIndex = allNotes.indexOfFirst { it.id == note.id }
-                    allNotes.subList(0, noteIndex) + note + allNotes.subList(noteIndex + 1, allNotes.size)
-                }.orElseGet { allNotes }
-            }
-    }
-
     override fun getAllVisibleNoteIds(): Observable<List<String>> {
-        // TODO use better way to get id
-        return getAllNotes()
-            .map { notes -> notes.map { it.id } }
+        return allNoteIdsSubject.hide()
     }
 
     override fun getNoteById(id: String): Observable<Note> {
-        // TODO use better way to get note
-        return getAllNotes().map { notes ->
-            Optional.ofNullable(notes.find { note -> note.id == id })
-        }.mapOptional { it }
+        if (noteSubjects[id] != null) {
+            return combineNoteSignals(noteSubjects[id]!!, id)
+        }
+
+        val documentRef = createDocumentRef(id)
+        val noteSubject = BehaviorSubject.create<Note>()
+        val registration = documentRef.addSnapshotListener { snapshot, error ->
+            if (snapshot != null) {
+                val note = documentToNotes(snapshot) ?: return@addSnapshotListener
+                noteSubject.onNext(note)
+            }
+        }
+
+        registrations[id] = registration
+        noteSubjects[id] = noteSubject
+
+        return combineNoteSignals(noteSubject, id)
+    }
+
+    private fun combineNoteSignals(remote: Observable<Note>, id: String): Observable<Note> {
+        return updatingNoteSubject.switchMap { optNote ->
+            if (optNote.isPresent && optNote.get().id == id) {
+                remote.map { optNote.get() }
+            } else {
+                remote
+            }
+        }
     }
 
     override fun addNote(note: Note) {
@@ -74,16 +87,31 @@ class FirebaseNoteRepository(
     }
 
     override fun deleteNote(noteId: String) {
+        registrations[noteId]?.remove()
+        noteSubjects[noteId]?.onComplete()
+
         firestore.collection(COLLECTION_NOTES)
             .document(noteId)
             .delete()
     }
 
-    private fun onSnapshotUpdated(snapshot: QuerySnapshot) {
-        val allNotes = snapshot
-            .map { document -> documentToNotes(document) }
+    private fun createDocumentRef(id: String): DocumentReference {
+        return firestore.collection(COLLECTION_NOTES).document(id)
+    }
 
-        allNotesSubject.onNext(allNotes)
+    private fun onSnapshotUpdated(snapshot: QuerySnapshot) {
+        if (snapshot.documentChanges.any { it.type == DocumentChange.Type.ADDED || it.type == DocumentChange.Type.REMOVED }) {
+            val allNoteIds = snapshot.map { it.id }
+            allNoteIdsSubject.onNext(allNoteIds)
+        }
+
+        snapshot.documentChanges
+            .filter { it.type == DocumentChange.Type.REMOVED }
+            .forEach { documentChange ->
+                val id = documentChange.document.id
+                registrations[id]?.remove()
+                noteSubjects[id]?.onComplete()
+            }
     }
 
     private fun setNoteDocument(note: Note) {
@@ -99,8 +127,8 @@ class FirebaseNoteRepository(
             .set(noteData)
     }
 
-    private fun documentToNotes(document: QueryDocumentSnapshot): Note {
-        val data: Map<String, Any> = document.data
+    private fun documentToNotes(document: DocumentSnapshot?): Note? {
+        val data: Map<String, Any> = document?.data as? Map<String, Any> ?: return null
         val text = data[FIELD_TEXT] as String
         val color = YBColor(data[FIELD_COLOR] as Long)
         val positionX = data[FIELD_POSITION_X] as String? ?: "0"

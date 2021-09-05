@@ -1,17 +1,10 @@
-package com.yanbin.reactivestickynote.domain
+package com.yanbin.reactivestickynote.ui.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.domain.NoteEditor
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
-import com.yanbin.reactivestickynote.model.YBColor
-import com.yanbin.utils.fromComputation
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.Observables
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.subjects.BehaviorSubject
-import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
 class EditorViewModel(

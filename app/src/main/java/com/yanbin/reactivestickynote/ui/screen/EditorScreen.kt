@@ -19,14 +19,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.domain.EditorViewModel
-import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import com.yanbin.reactivestickynote.ui.view.BoardView
-import com.yanbin.reactivestickynote.ui.view.MenuView
 import com.yanbin.reactivestickynote.ui.view.StatefulMenuView
 import com.yanbin.utils.subscribeBy
 import com.yanbin.utils.toMain
-import java.util.*
 
 @ExperimentalAnimationApi
 @Composable
