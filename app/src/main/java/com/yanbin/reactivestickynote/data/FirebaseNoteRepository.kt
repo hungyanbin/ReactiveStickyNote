@@ -5,6 +5,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
 import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.utils.toIO
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
@@ -28,15 +29,15 @@ class FirebaseNoteRepository(
         }
 
         updatingNoteSubject
-            .throttleLast(300, TimeUnit.MILLISECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
+            .throttleLast(1000, TimeUnit.MILLISECONDS)
+            .toIO()
             .subscribe { optNote ->
                 optNote.ifPresent { setNoteDocument(it) }
             }
 
         updatingNoteSubject
             .filter { it.isPresent }
-            .debounce(300, TimeUnit.MILLISECONDS)
+            .debounce(1000, TimeUnit.MILLISECONDS)
             .subscribe {
                 updatingNoteSubject.onNext(Optional.empty<Note>())
             }
@@ -58,7 +59,7 @@ class FirebaseNoteRepository(
         }.mapOptional { it }
     }
 
-    override fun addNote(note: Note) {
+    override fun createNote(note: Note) {
         setNoteDocument(note)
     }
 

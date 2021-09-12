@@ -22,6 +22,15 @@ import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
 
+private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show ->
+    if (show) {
+        this.border(2.dp, Color.Black, MaterialTheme.shapes.medium)
+    } else {
+        this
+    }.padding(8.dp)
+}
+
+
 @Composable
 fun StickyNote(
     modifier: Modifier = Modifier,
@@ -36,14 +45,6 @@ fun StickyNote(
             note.position.y.toInt()
         )
     )
-
-    val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show ->
-        if (show) {
-            this.border(2.dp, Color.Black, MaterialTheme.shapes.medium)
-        } else {
-            this
-        }.padding(8.dp)
-    }
 
     Surface(
         modifier.offset { offset }

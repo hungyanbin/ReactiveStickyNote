@@ -55,7 +55,7 @@ class EditorViewModel(
 
     fun addNewNote() {
         val newNote = Note.createRandomNote()
-        noteRepository.addNote(newNote)
+        noteRepository.createNote(newNote)
     }
 
     fun tapNote(note: Note) {

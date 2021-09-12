@@ -18,7 +18,7 @@ class InMemoryNoteRepository: NoteRepository {
         notes.onNext(noteMap.elements().toList())
     }
 
-    override fun addNote(note: Note) {
+    override fun createNote(note: Note) {
         noteMap[note.id] = note
     }
 

@@ -7,6 +7,6 @@ interface NoteRepository {
     fun getAllNotes(): Observable<List<Note>>
     fun getNoteById(id: String): Observable<Note>
     fun putNote(note: Note)
-    fun addNote(note: Note)
+    fun createNote(note: Note)
     fun deleteNote(noteId: String)
 }

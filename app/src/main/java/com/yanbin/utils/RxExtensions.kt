@@ -8,6 +8,10 @@ fun <T> Observable<T>.fromIO(): Observable<T> {
     return this.subscribeOn(Schedulers.io())
 }
 
+fun <T> Observable<T>.toIO(): Observable<T> {
+    return this.observeOn(Schedulers.io())
+}
+
 fun <T> Observable<T>.fromComputation(): Observable<T> {
     return this.subscribeOn(Schedulers.computation())
 }
