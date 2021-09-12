@@ -4,12 +4,11 @@ import com.yanbin.reactivestickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
 import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.rxjava3.core.Observable
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import java.util.*
 
