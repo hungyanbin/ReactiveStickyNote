@@ -5,7 +5,7 @@ import com.yanbin.reactivestickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.ui.vm.ContextMenuViewModel
 import com.yanbin.reactivestickynote.domain.EditTextViewModel
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
-import com.yanbin.reactivestickynote.domain.NoteEditor
+import com.yanbin.reactivestickynote.domain.StickyNoteEditor
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -13,13 +13,13 @@ fun getNoteModule() =
     module {
         viewModel {
             EditorViewModel(
-                noteEditor = get()
+                stickyNoteEditor = get()
             )
         }
 
         viewModel {
             ContextMenuViewModel(
-                contextMenu = get<NoteEditor>().contextMenu
+                contextMenu = get<StickyNoteEditor>().contextMenu
             )
         }
 
@@ -31,7 +31,7 @@ fun getNoteModule() =
             )
         }
 
-        single { NoteEditor(
+        single { StickyNoteEditor(
             noteRepository = get()
         ) }
 

@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
-class NoteEditor(
+class StickyNoteEditor(
     private val noteRepository: NoteRepository
 ) {
 
@@ -39,6 +39,7 @@ class NoteEditor(
     val openEditTextScreen: Observable<Note> = openEditTextScreenSignal.withLatestFrom(selectedNote) { _, optNote ->
         optNote
     }.mapOptional { it }
+
 
     // Component
     val contextMenu = ContextMenu(selectedNote)

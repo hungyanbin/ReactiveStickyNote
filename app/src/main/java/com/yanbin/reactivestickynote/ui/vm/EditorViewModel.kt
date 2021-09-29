@@ -1,47 +1,46 @@
 package com.yanbin.reactivestickynote.ui.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.domain.NoteEditor
+import com.yanbin.reactivestickynote.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
 import io.reactivex.rxjava3.core.Observable
 import java.util.*
 
 class EditorViewModel(
-    private val noteEditor: NoteEditor
+    private val stickyNoteEditor: StickyNoteEditor
 ): ViewModel() {
 
-    val selectingNote: Observable<Optional<Note>> = noteEditor.selectedNote
-    val openEditTextScreen: Observable<Note> = noteEditor.openEditTextScreen
-    val allVisibleNoteIds = noteEditor.allVisibleNotes
-    val showContextMenu = noteEditor.showContextMenu
-    val showAddButton = noteEditor.showAddButton
-
+    val selectingNote: Observable<Optional<Note>> = stickyNoteEditor.selectedNote
+    val openEditTextScreen: Observable<Note> = stickyNoteEditor.openEditTextScreen
+    val allVisibleNoteIds = stickyNoteEditor.allVisibleNotes
+    val showContextMenu = stickyNoteEditor.showContextMenu
+    val showAddButton = stickyNoteEditor.showAddButton
 
     init {
-        noteEditor.start()
+        stickyNoteEditor.start()
     }
 
     fun moveNote(noteId: String, positionDelta: Position) {
-        noteEditor.moveNote(noteId, positionDelta)
+        stickyNoteEditor.moveNote(noteId, positionDelta)
     }
 
     fun addNewNote() {
-        noteEditor.addNewNote()
+        stickyNoteEditor.addNewNote()
     }
 
     fun tapNote(note: Note) {
-        noteEditor.selectNote(note.id)
+        stickyNoteEditor.selectNote(note.id)
     }
 
     fun tapCanvas() {
-        noteEditor.clearSelection()
+        stickyNoteEditor.clearSelection()
     }
 
-    fun getNoteById(id: String) = noteEditor.getNoteById(id)
+    fun getNoteById(id: String) = stickyNoteEditor.getNoteById(id)
 
     override fun onCleared() {
-        noteEditor.stop()
+        stickyNoteEditor.stop()
     }
 
 }
