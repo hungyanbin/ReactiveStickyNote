@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
-class NoteEditor(
+class CoEditor(
     private val noteRepository: NoteRepository
 ) {
 
@@ -35,7 +35,7 @@ class NoteEditor(
 
     val allVisibleNotes: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
-    val showAddButton: Observable<Boolean> = _showAddButton.hide()
+    val showAdderButton: Observable<Boolean> = _showAddButton.hide()
     val openEditTextScreen: Observable<String> = _openEditTextScreen.hide()
 
     // Component
