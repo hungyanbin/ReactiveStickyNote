@@ -3,7 +3,7 @@ package com.yanbin.reactivestickynote.data
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.*
-import com.yanbin.reactivestickynote.model.Note
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.Position
 import com.yanbin.reactivestickynote.model.YBColor
 import com.yanbin.utils.toIO
@@ -17,10 +17,10 @@ class FirebaseNoteRepository : NoteRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val allNoteIdsSubject = BehaviorSubject.create<List<String>>()
-    private val updatingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
+    private val updatingNoteSubject = BehaviorSubject.createDefault(Optional.empty<StickyNote>())
 
     private val registrations = hashMapOf<String, ListenerRegistration>()
-    private val noteSubjects = hashMapOf<String, Subject<Note>>()
+    private val noteSubjects = hashMapOf<String, Subject<StickyNote>>()
 
     private val query = firestore.collection(COLLECTION_NOTES)
         .limit(100)
@@ -41,7 +41,7 @@ class FirebaseNoteRepository : NoteRepository {
             .filter { it.isPresent }
             .debounce(1000, TimeUnit.MILLISECONDS)
             .subscribe {
-                updatingNoteSubject.onNext(Optional.empty<Note>())
+                updatingNoteSubject.onNext(Optional.empty<StickyNote>())
             }
     }
 
@@ -49,13 +49,13 @@ class FirebaseNoteRepository : NoteRepository {
         return allNoteIdsSubject.hide()
     }
 
-    override fun getNoteById(id: String): Observable<Note> {
+    override fun getNoteById(id: String): Observable<StickyNote> {
         if (noteSubjects[id] != null) {
             return combineNoteSignals(noteSubjects[id]!!, id)
         }
 
         val documentRef = createDocumentRef(id)
-        val noteSubject = BehaviorSubject.create<Note>()
+        val noteSubject = BehaviorSubject.create<StickyNote>()
         val registration = documentRef.addSnapshotListener { snapshot, error ->
             if (snapshot != null) {
                 val note = documentToNotes(snapshot) ?: return@addSnapshotListener
@@ -69,7 +69,7 @@ class FirebaseNoteRepository : NoteRepository {
         return combineNoteSignals(noteSubject, id)
     }
 
-    private fun combineNoteSignals(remote: Observable<Note>, id: String): Observable<Note> {
+    private fun combineNoteSignals(remote: Observable<StickyNote>, id: String): Observable<StickyNote> {
         return updatingNoteSubject.switchMap { optNote ->
             if (optNote.isPresent && optNote.get().id == id) {
                 remote.map { optNote.get() }
@@ -79,12 +79,12 @@ class FirebaseNoteRepository : NoteRepository {
         }
     }
 
-    override fun createNote(note: Note) {
+    override fun createNote(note: StickyNote) {
         setNoteDocument(note)
     }
 
-    override fun putNote(note: Note) {
-        updatingNoteSubject.onNext(Optional.of(note))
+    override fun putNote(stickyNote: StickyNote) {
+        updatingNoteSubject.onNext(Optional.of(stickyNote))
     }
 
     override fun deleteNote(noteId: String) {
@@ -115,27 +115,27 @@ class FirebaseNoteRepository : NoteRepository {
             }
     }
 
-    private fun setNoteDocument(note: Note) {
+    private fun setNoteDocument(stickyNote: StickyNote) {
         val noteData = hashMapOf(
-            FIELD_TEXT to note.text,
-            FIELD_COLOR to note.color.color,
-            FIELD_POSITION_X to note.position.x,
-            FIELD_POSITION_Y to note.position.y
+            FIELD_TEXT to stickyNote.text,
+            FIELD_COLOR to stickyNote.color.color,
+            FIELD_POSITION_X to stickyNote.position.x,
+            FIELD_POSITION_Y to stickyNote.position.y
         )
 
         firestore.collection(COLLECTION_NOTES)
-            .document(note.id)
+            .document(stickyNote.id)
             .set(noteData)
     }
 
-    private fun documentToNotes(document: DocumentSnapshot?): Note? {
+    private fun documentToNotes(document: DocumentSnapshot?): StickyNote? {
         val data: Map<String, Any> = document?.data as? Map<String, Any> ?: return null
         val text = data[FIELD_TEXT] as String
         val color = YBColor(data[FIELD_COLOR] as Long)
         val positionX = data[FIELD_POSITION_X] as Double? ?: 0f
         val positionY = data[FIELD_POSITION_Y] as Double? ?: 0f
         val position = Position(positionX.toFloat(), positionY.toFloat())
-        return Note(document.id, text, position, color)
+        return StickyNote(document.id, text, position, color)
     }
 
     companion object {

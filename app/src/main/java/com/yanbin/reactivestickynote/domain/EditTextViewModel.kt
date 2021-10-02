@@ -2,6 +2,7 @@ package com.yanbin.reactivestickynote.domain
 
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -17,6 +18,7 @@ class EditTextViewModel(
     private val disposableBag = CompositeDisposable()
 
     private val textSubject = BehaviorSubject.createDefault(defaultText)
+
     val text: Observable<String> = textSubject.hide()
 
     fun onTextChanged(newText: String) {
@@ -32,7 +34,7 @@ class EditTextViewModel(
                 note.copy(text = text)
             }
             .subscribe { newNote ->
-                noteRepository.putNote(note = newNote)
+                noteRepository.putNote(stickyNote = newNote)
                 leavePageSubject.onNext(Unit)
             }
             .addTo(disposableBag)

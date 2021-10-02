@@ -1,13 +1,11 @@
 package com.yanbin.reactivestickynote.domain
 
 import com.yanbin.reactivestickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.model.Note
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.Position
 import com.yanbin.reactivestickynote.model.YBColor
-import com.yanbin.utils.fromComputation
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -23,7 +21,7 @@ class StickyNoteEditor(
     private val selectedNoteId = BehaviorSubject.createDefault(Optional.empty<String>())
 
     // State
-    val selectedNote: Observable<Optional<Note>> = selectedNoteId
+    val selectedNote: Observable<Optional<StickyNote>> = selectedNoteId
         .switchMap { optId ->
             if (optId.isPresent) {
                 noteRepository.getNoteById(optId.get())
@@ -36,7 +34,7 @@ class StickyNoteEditor(
     val allVisibleNotes: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
     val showAddButton: Observable<Boolean> = _showAddButton.hide()
-    val openEditTextScreen: Observable<Note> = openEditTextScreenSignal.withLatestFrom(selectedNote) { _, optNote ->
+    val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.withLatestFrom(selectedNote) { _, optNote ->
         optNote
     }.mapOptional { it }
 
@@ -78,12 +76,12 @@ class StickyNoteEditor(
         _showContextMenu.onNext(false)
     }
 
-    fun getNoteById(id: String): Observable<Note> {
+    fun getNoteById(id: String): Observable<StickyNote> {
         return noteRepository.getNoteById(id)
     }
 
     fun addNewNote() {
-        val newNote = Note.createRandomNote()
+        val newNote = StickyNote.createRandomNote()
         noteRepository.createNote(newNote)
     }
 

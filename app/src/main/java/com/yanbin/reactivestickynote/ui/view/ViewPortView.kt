@@ -8,13 +8,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun BoardView(
+fun ViewPortView(
     noteIds: List<String>
 ) {
     Box(Modifier.fillMaxSize()) {
         noteIds.forEach { id ->
             key(id) {
-                StatefulStickyNote(
+                StatefulStickyNoteView(
                     modifier = Modifier.align(Alignment.Center),
                     id = id
                 )

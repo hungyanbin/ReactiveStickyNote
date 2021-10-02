@@ -2,7 +2,7 @@ package com.yanbin.reactivestickynote.ui.vm
 
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.domain.StickyNoteEditor
-import com.yanbin.reactivestickynote.model.Note
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.Position
 import io.reactivex.rxjava3.core.Observable
 import java.util.*
@@ -11,8 +11,8 @@ class EditorViewModel(
     private val stickyNoteEditor: StickyNoteEditor
 ): ViewModel() {
 
-    val selectingNote: Observable<Optional<Note>> = stickyNoteEditor.selectedNote
-    val openEditTextScreen: Observable<Note> = stickyNoteEditor.openEditTextScreen
+    val selectingNote: Observable<Optional<StickyNote>> = stickyNoteEditor.selectedNote
+    val openEditTextScreen: Observable<StickyNote> = stickyNoteEditor.openEditTextScreen
     val allVisibleNoteIds = stickyNoteEditor.allVisibleNotes
     val showContextMenu = stickyNoteEditor.showContextMenu
     val showAddButton = stickyNoteEditor.showAddButton
@@ -29,7 +29,7 @@ class EditorViewModel(
         stickyNoteEditor.addNewNote()
     }
 
-    fun tapNote(note: Note) {
+    fun tapNote(note: StickyNote) {
         stickyNoteEditor.selectNote(note.id)
     }
 

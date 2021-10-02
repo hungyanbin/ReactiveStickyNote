@@ -19,18 +19,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.model.Note
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
-import com.yanbin.reactivestickynote.ui.view.BoardView
+import com.yanbin.reactivestickynote.ui.view.ViewPortView
 import com.yanbin.reactivestickynote.ui.view.StatefulContextMenuView
 import com.yanbin.utils.subscribeBy
 import com.yanbin.utils.toMain
 
 @ExperimentalAnimationApi
 @Composable
-fun EditorScreen(
+fun StickyNoteEditorScreen(
     viewModel: EditorViewModel,
-    openEditTextScreen: (Note) -> Unit
+    openEditTextScreen: (StickyNote) -> Unit
 ) {
     viewModel.openEditTextScreen
         .toMain()
@@ -48,7 +48,7 @@ fun EditorScreen(
             val showAddButton by viewModel.showAddButton.subscribeAsState(initial = true)
             val noteIdsState by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
 
-            BoardView(noteIdsState)
+            ViewPortView(noteIdsState)
 
             AnimatedVisibility(
                 visible = showAddButton,
