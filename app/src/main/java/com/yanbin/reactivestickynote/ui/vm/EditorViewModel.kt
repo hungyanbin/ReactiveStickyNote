@@ -10,7 +10,7 @@ class EditorViewModel(
 ): ViewModel() {
 
     val openEditTextScreen: Observable<StickyNote> = stickyNoteEditor.openEditTextScreen
-    val allVisibleNoteIds = stickyNoteEditor.allVisibleNotes
+    val allVisibleNoteIds = stickyNoteEditor.allVisibleNoteIds
     val showContextMenu = stickyNoteEditor.showContextMenu
     val showAddButton = stickyNoteEditor.showAddButton
 

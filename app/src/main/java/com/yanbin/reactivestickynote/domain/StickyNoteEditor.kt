@@ -31,7 +31,7 @@ class StickyNoteEditor(
             }
         }
 
-    val allVisibleNotes: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
+    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
     val showAddButton: Observable<Boolean> = _showAddButton.hide()
     val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.withLatestFrom(selectedNote) { _, optNote ->
