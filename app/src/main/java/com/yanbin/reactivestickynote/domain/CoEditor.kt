@@ -31,7 +31,7 @@ class CoEditor(
             }
         }
 
-    val allVisibleNotes: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
+    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
     val showAdderButton: Observable<Boolean> = _showAddButton.hide()
     val openEditTextScreen: Observable<String> = _openEditTextScreen.hide()

@@ -8,7 +8,7 @@ class EditorViewModel(
     private val coEditor: CoEditor
 ): ViewModel() {
 
-    val allVisibleNoteIds: Observable<List<String>> = coEditor.allVisibleNotes
+    val allVisibleNoteIds: Observable<List<String>> = coEditor.allVisibleNoteIds
     val openEditTextScreen: Observable<String> = coEditor.openEditTextScreen
     val showContextMenu = coEditor.showContextMenu
     val showAddButton = coEditor.showAdderButton

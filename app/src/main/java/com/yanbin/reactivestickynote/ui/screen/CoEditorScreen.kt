@@ -45,9 +45,9 @@ fun CoEditorScreen(
         ) {
             val showContextMenu by viewModel.showContextMenu.subscribeAsState(initial = false)
             val showAddButton by viewModel.showAddButton.subscribeAsState(initial = true)
-            val noteIdsState by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
+            val noteIds by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
 
-            ViewPortView(noteIdsState)
+            ViewPortView(noteIds)
 
             AnimatedVisibility(
                 visible = showAddButton,
