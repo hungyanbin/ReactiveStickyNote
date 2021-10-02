@@ -6,6 +6,7 @@ import com.yanbin.reactivestickynote.ui.vm.ContextMenuViewModel
 import com.yanbin.reactivestickynote.domain.EditTextViewModel
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import com.yanbin.reactivestickynote.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.ui.vm.StickyNoteViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -34,6 +35,12 @@ fun getNoteModule() =
         single { StickyNoteEditor(
             noteRepository = get()
         ) }
+
+        viewModel {
+            StickyNoteViewModel(
+                stickyNoteEditor = get()
+            )
+        }
 
         single<NoteRepository> {
             FirebaseNoteRepository()
