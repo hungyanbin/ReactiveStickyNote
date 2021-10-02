@@ -20,14 +20,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
-import com.yanbin.reactivestickynote.ui.view.BoardView
+import com.yanbin.reactivestickynote.ui.view.ViewPortView
 import com.yanbin.reactivestickynote.ui.view.StatefulContextMenuView
 import com.yanbin.utils.subscribeBy
 import com.yanbin.utils.toMain
 
 @ExperimentalAnimationApi
 @Composable
-fun EditorScreen(
+fun CoEditorScreen(
     viewModel: EditorViewModel,
     openEditTextScreen: (String) -> Unit
 ) {
@@ -47,7 +47,7 @@ fun EditorScreen(
             val showAddButton by viewModel.showAddButton.subscribeAsState(initial = true)
             val noteIdsState by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
 
-            BoardView(noteIdsState)
+            ViewPortView(noteIdsState)
 
             AnimatedVisibility(
                 visible = showAddButton,

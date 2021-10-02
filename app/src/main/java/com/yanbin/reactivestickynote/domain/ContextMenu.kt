@@ -1,13 +1,13 @@
 package com.yanbin.reactivestickynote.domain
 
-import com.yanbin.reactivestickynote.model.Note
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.YBColor
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
 class ContextMenu(
-    private val selectedNote: Observable<Optional<Note>>
+    private val selectedNote: Observable<Optional<StickyNote>>
 ) {
 
     private val _contextMenuEvents = PublishSubject.create<ContextMenuEvent>()

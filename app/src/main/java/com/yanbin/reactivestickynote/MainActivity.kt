@@ -10,7 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.yanbin.reactivestickynote.domain.EditTextViewModel
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import com.yanbin.reactivestickynote.ui.screen.EditTextScreen
-import com.yanbin.reactivestickynote.ui.screen.EditorScreen
+import com.yanbin.reactivestickynote.ui.screen.CoEditorScreen
 import com.yanbin.reactivestickynote.ui.screen.Screen
 import com.yanbin.reactivestickynote.ui.theme.ReactiveStickyNoteTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController, startDestination = Screen.Board.route) {
                     composable(Screen.Board.route) {
                         val viewModel by viewModel<EditorViewModel>()
-                        EditorScreen(
+                        CoEditorScreen(
                             viewModel = viewModel,
                             openEditTextScreen = { id ->
                                 navController.navigate(Screen.EditText.route + "/" + id)

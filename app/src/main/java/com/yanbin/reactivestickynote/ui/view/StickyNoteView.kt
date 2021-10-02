@@ -22,13 +22,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
-import com.yanbin.reactivestickynote.model.Note
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.Position
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 @Composable
-fun StatefulStickyNote(
+fun StatefulStickyNoteView(
     id: String,
     modifier: Modifier = Modifier,
 ) {
@@ -36,30 +36,30 @@ fun StatefulStickyNote(
     val onPositionChanged: (Position) -> Unit = { delta ->
         editorViewModel.moveNote(id, delta)
     }
-    val note by editorViewModel.getNoteById(id).subscribeAsState(initial = Note.createEmptyNote(id))
+    val note by editorViewModel.getNoteById(id).subscribeAsState(initial = StickyNote.createEmptyNote(id))
     val selectedNote by editorViewModel.selectingNote.subscribeAsState(initial = Optional.empty())
     val selected = selectedNote.filter { it.id == id }.isPresent
 
-    StickyNote(
+    StickyNoteView(
         modifier = modifier,
         onPositionChanged = onPositionChanged,
         onClick = editorViewModel::tapNote,
-        note = note,
+        stickyNote = note,
         selected = selected)
 }
 
 @Composable
-fun StickyNote(
+fun StickyNoteView(
     modifier: Modifier = Modifier,
     onPositionChanged: (Position) -> Unit = {},
-    onClick: (Note) -> Unit,
-    note: Note,
+    onClick: (StickyNote) -> Unit,
+    stickyNote: StickyNote,
     selected: Boolean,
 ) {
     val offset by animateIntOffsetAsState(
         targetValue = IntOffset(
-            note.position.x.toInt(),
-            note.position.y.toInt()
+            stickyNote.position.x.toInt(),
+            stickyNote.position.y.toInt()
         )
     )
 
@@ -75,12 +75,12 @@ fun StickyNote(
         modifier.offset { offset }
             .size(108.dp, 108.dp)
             .highlightBorder(selected),
-        color = Color(note.color.color),
+        color = Color(stickyNote.color.color),
         elevation = 8.dp
     ) {
         Column(modifier = Modifier
-            .clickable { onClick(note) }
-            .pointerInput(note.id) {
+            .clickable { onClick(stickyNote) }
+            .pointerInput(stickyNote.id) {
                 detectDragGestures { change, dragAmount ->
                     change.consumeAllChanges()
                     onPositionChanged(Position(dragAmount.x, dragAmount.y))
@@ -88,7 +88,7 @@ fun StickyNote(
             }
             .padding(16.dp)
         ) {
-            Text(text = note.text, style = MaterialTheme.typography.h5)
+            Text(text = stickyNote.text, style = MaterialTheme.typography.h5)
         }
     }
 }
