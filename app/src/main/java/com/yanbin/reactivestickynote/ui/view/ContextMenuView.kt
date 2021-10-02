@@ -29,13 +29,13 @@ import com.yanbin.reactivestickynote.model.YBColor
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @Composable
-fun StatefulMenuView(
+fun StatefulContextMenuView(
     modifier: Modifier = Modifier
 ) {
     val contextMenuViewModel by LocalViewModelStoreOwner.current!!.viewModel<ContextMenuViewModel>()
     val selectedColor by contextMenuViewModel.selectedColor.subscribeAsState(initial = YBColor.Aquamarine)
     
-    MenuView(
+    ContextMenuView(
         modifier = modifier,
         selectedColor = selectedColor, 
         allColors = contextMenuViewModel.colorOptions,
@@ -47,7 +47,7 @@ fun StatefulMenuView(
 
 
 @Composable
-fun MenuView(
+fun ContextMenuView(
     modifier: Modifier = Modifier,
     selectedColor: YBColor,
     allColors: List<YBColor>,
@@ -96,5 +96,4 @@ fun MenuView(
             }
         }
     }
-
 }

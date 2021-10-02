@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import com.yanbin.reactivestickynote.ui.view.BoardView
-import com.yanbin.reactivestickynote.ui.view.StatefulMenuView
+import com.yanbin.reactivestickynote.ui.view.StatefulContextMenuView
 import com.yanbin.utils.subscribeBy
 import com.yanbin.utils.toMain
 
@@ -67,7 +67,7 @@ fun EditorScreen(
                 visible = showContextMenu,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                StatefulMenuView()
+                StatefulContextMenuView()
             }
 
         }
