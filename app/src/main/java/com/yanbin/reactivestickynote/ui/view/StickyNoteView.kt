@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.Position
+import com.yanbin.reactivestickynote.ui.vm.StickyNoteViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
@@ -32,18 +33,17 @@ fun StatefulStickyNoteView(
     id: String,
     modifier: Modifier = Modifier,
 ) {
-    val editorViewModel by LocalViewModelStoreOwner.current!!.viewModel<EditorViewModel>()
+    val stickyNoteViewModel by LocalViewModelStoreOwner.current!!.viewModel<StickyNoteViewModel>()
     val onPositionChanged: (Position) -> Unit = { delta ->
-        editorViewModel.moveNote(id, delta)
+        stickyNoteViewModel.moveNote(id, delta)
     }
-    val note by editorViewModel.getNoteById(id).subscribeAsState(initial = StickyNote.createEmptyNote(id))
-    val selectedNote by editorViewModel.selectingNote.subscribeAsState(initial = Optional.empty())
-    val selected = selectedNote.filter { it.id == id }.isPresent
+    val note by stickyNoteViewModel.getNoteById(id).subscribeAsState(initial = StickyNote.createEmptyNote(id))
+    val selected: Boolean by stickyNoteViewModel.isSelected(id).subscribeAsState(false)
 
     StickyNoteView(
         modifier = modifier,
         onPositionChanged = onPositionChanged,
-        onClick = editorViewModel::tapNote,
+        onClick = stickyNoteViewModel::tapNote,
         stickyNote = note,
         selected = selected)
 }
