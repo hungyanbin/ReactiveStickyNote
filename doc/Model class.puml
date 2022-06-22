@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Note {
+    + id: String
+    + text: String
+    + position: Position
+    + color: YBColor
+}
+
+class Position {
+    + x: Float
+    + y: Float
+}
+
+class YBColor {
+    + color: Long
+}
+
+Note --> Position
+Note --> YBColor
+
+hide empty members
+
+@enduml
