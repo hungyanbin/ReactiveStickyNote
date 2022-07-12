@@ -1,5 +1,6 @@
 package com.yanbin.reactivestickynote.data
 
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.yanbin.reactivestickynote.model.Note
@@ -84,8 +85,8 @@ class FirebaseNoteRepository(
         val noteData = hashMapOf(
             FIELD_TEXT to note.text,
             FIELD_COLOR to note.color.color,
-            FIELD_POSITION_X to note.position.x.toString(),
-            FIELD_POSITION_Y to note.position.y.toString()
+            FIELD_POSITION_X to note.position.x,
+            FIELD_POSITION_Y to note.position.y
         )
 
         firestore.collection(COLLECTION_NOTES)
@@ -97,8 +98,8 @@ class FirebaseNoteRepository(
         val data: Map<String, Any> = document.data
         val text = data[FIELD_TEXT] as String
         val color = YBColor(data[FIELD_COLOR] as Long)
-        val positionX = data[FIELD_POSITION_X] as String? ?: "0"
-        val positionY = data[FIELD_POSITION_Y] as String? ?: "0"
+        val positionX = data[FIELD_POSITION_X] as Double? ?: 0f
+        val positionY = data[FIELD_POSITION_Y] as Double? ?: 0f
         val position = Position(positionX.toFloat(), positionY.toFloat())
         return Note(document.id, text, position, color)
     }
