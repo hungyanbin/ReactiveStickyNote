@@ -20,25 +20,17 @@ class EditorViewModel(
 
     private val disposableBag = CompositeDisposable()
     private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
-    private val selectingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
     private val openEditTextSubject = PublishSubject.create<String>()
 
     val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
-    val selectingNote: Observable<Optional<Note>> = selectingNoteSubject.hide()
+    val selectingNote: Observable<Optional<Note>> = Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
+        Optional.ofNullable<Note>(notes.find { note -> note.id == id })
+    }.replay(1).autoConnect()
+
     val selectingColor: Observable<YBColor> = selectingNote
         .mapOptional { it }
         .map { it.color }
     val openEditTextScreen: Observable<String> = openEditTextSubject.hide()
-
-    init {
-        Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
-            Optional.ofNullable<Note>(notes.find { note -> note.id == id })
-        }.fromComputation()
-            .subscribe { optNote ->
-                selectingNoteSubject.onNext(optNote)
-            }
-            .addTo(disposableBag)
-    }
 
     fun moveNote(noteId: String, positionDelta: Position) {
         Observable.just(Pair(noteId, positionDelta))
@@ -80,17 +72,14 @@ class EditorViewModel(
     }
 
     fun onColorSelected(color: YBColor) {
-        val optSelectingNote = selectingNoteSubject.value
-
-        optSelectingNote
-            .map { note -> note.copy(color = color) }
-            .ifPresent { note ->
-                noteRepository.putNote(note)
-            }
+        runOnSelectingNote { note ->
+            val newNote = note.copy(color = color)
+            noteRepository.putNote(newNote)
+        }
     }
 
     fun onEditTextClicked() {
-        selectingNoteSubject.value.ifPresent { note ->
+        runOnSelectingNote { note ->
             openEditTextSubject.onNext(note.id)
         }
     }
@@ -99,4 +88,11 @@ class EditorViewModel(
         disposableBag.clear()
     }
 
+    private fun runOnSelectingNote(runner: (Note) -> Unit) {
+        selectingNote
+            .take(1)
+            .mapOptional { it }
+            .subscribe(runner)
+            .addTo(disposableBag)
+    }
 }
