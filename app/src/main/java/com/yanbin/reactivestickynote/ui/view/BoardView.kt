@@ -14,14 +14,11 @@ import java.util.*
 
 @Composable
 fun BoardView(
-    notesState: State<List<Note>>,
-    selectedNoteState: State<Optional<Note>>,
+    notes: List<Note>,
+    selectedNote: Optional<Note>,
     updateNotePosition: (String, Position) -> Unit,
     onNoteClicked: (Note) -> Unit
 ) {
-    val notes by notesState
-    val selectedNote by selectedNoteState
-
     Box(Modifier.fillMaxSize()) {
         notes.forEach { note ->
             val onNotePositionChanged: (Position) -> Unit = { delta ->

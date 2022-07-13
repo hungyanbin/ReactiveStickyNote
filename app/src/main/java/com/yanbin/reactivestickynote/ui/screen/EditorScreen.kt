@@ -44,17 +44,16 @@ fun EditorScreen(
                     detectTapGestures { viewModel.tapCanvas() }
                 }
         ) {
-            val selectedNoteState = viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
-            val selectedNote by selectedNoteState
+            val selectedNote by viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
             val selectingColor by viewModel.selectingColor.subscribeAsState(initial = YBColor.Aquamarine)
-
+            val allNotes by viewModel.allNotes.subscribeAsState(initial = emptyList())
             BoardView(
-                viewModel.allNotes.subscribeAsState(initial = emptyList()),
-                selectedNoteState,
+                allNotes,
+                selectedNote,
                 viewModel::moveNote,
                 viewModel::tapNote
             )
-
+            
             AnimatedVisibility(
                 visible = !selectedNote.isPresent,
                 modifier = Modifier.align(Alignment.BottomEnd)
@@ -80,8 +79,6 @@ fun EditorScreen(
                     onTextClicked = viewModel::onEditTextClicked
                 )
             }
-
         }
-
     }
 }
