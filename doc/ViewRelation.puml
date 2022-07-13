@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide empty members
+hide circle
+
+class EditorScreen
+class BoardView
+class StickyNote
+class MenuView
+
+EditorScreen "1" -->  "1" BoardView
+EditorScreen "1" -->  "0..1" MenuView
+BoardView  "1" -->  "many" StickyNote
+EditorScreen -> EditorViewModel
+
+
+
+@enduml
