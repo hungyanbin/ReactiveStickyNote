@@ -12,8 +12,6 @@ class NoteApplication: Application() {
         super.onCreate()
 
         startKoin {
-            // Koin Android logger
-            androidLogger()
             //inject Android context
             androidContext(this@NoteApplication)
             // use modules
