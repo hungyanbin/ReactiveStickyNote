@@ -5,7 +5,6 @@ import com.yanbin.reactivestickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
 import com.yanbin.reactivestickynote.model.YBColor
-import com.yanbin.utils.fromComputation
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.Observables
@@ -20,7 +19,7 @@ class EditorViewModel(
 
     private val disposableBag = CompositeDisposable()
     private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
-    private val openEditTextSubject = PublishSubject.create<String>()
+    private val openEditTextSubject = PublishSubject.create<Note>()
 
     val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
     val selectingNote: Observable<Optional<Note>> = Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
@@ -30,7 +29,7 @@ class EditorViewModel(
     val selectingColor: Observable<YBColor> = selectingNote
         .mapOptional { it }
         .map { it.color }
-    val openEditTextScreen: Observable<String> = openEditTextSubject.hide()
+    val openEditTextScreen: Observable<Note> = openEditTextSubject.hide()
 
     fun moveNote(noteId: String, positionDelta: Position) {
         Observable.just(Pair(noteId, positionDelta))
@@ -80,7 +79,7 @@ class EditorViewModel(
 
     fun onEditTextClicked() {
         runOnSelectingNote { note ->
-            openEditTextSubject.onNext(note.id)
+            openEditTextSubject.onNext(note)
         }
     }
 

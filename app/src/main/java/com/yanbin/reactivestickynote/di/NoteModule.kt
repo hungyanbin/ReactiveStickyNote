@@ -15,10 +15,11 @@ fun getNoteModule() =
             EditorViewModel(get())
         }
 
-        viewModel { (noteId: String) ->
+        viewModel { (noteId: String, defaultText: String) ->
             EditTextViewModel(
                 noteRepository = get(),
-                noteId = noteId
+                noteId = noteId,
+                defaultText = defaultText
             )
         }
 

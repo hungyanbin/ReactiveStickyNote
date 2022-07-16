@@ -29,17 +29,20 @@ class MainActivity : ComponentActivity() {
                         val viewModel by viewModel<EditorViewModel>()
                         EditorScreen(
                             viewModel = viewModel,
-                            openEditTextScreen = { id ->
-                                navController.navigate(Screen.EditText.route + "/" + id)
+                            openEditTextScreen = { note ->
+                                navController.navigate(Screen.EditText.buildRoute(note.id, note.text))
                             }
                         )
                     }
 
                     composable(
-                        Screen.EditText.route + "/" + "{${Screen.EditText.KEY_NOTE_ID}}"
+                        Screen.EditText.route
                     ) { backStackEntry ->
                         val viewModel by backStackEntry.viewModel<EditTextViewModel> {
-                            parametersOf(backStackEntry.arguments?.getString(Screen.EditText.KEY_NOTE_ID))
+                            parametersOf(
+                                backStackEntry.arguments?.getString(Screen.EditText.KEY_NOTE_ID),
+                                backStackEntry.arguments?.getString(Screen.EditText.KEY_DEFAULT_TEXT),
+                            )
                         }
                         EditTextScreen(viewModel, onLeaveScreen = { navController.popBackStack() })
                     }
