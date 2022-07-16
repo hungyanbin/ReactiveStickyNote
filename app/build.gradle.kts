@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion(Version.Android.compileSdk)
-    buildToolsVersion(Version.Android.buildTool)
+    compileSdk = Version.Android.compileSdk
+    buildToolsVersion = Version.Android.buildTool
 
     defaultConfig {
         applicationId = "com.yanbin.reactivestickynote"
-        minSdkVersion(Version.Android.minSdk)
-        targetSdkVersion(Version.Android.targetSdk)
+        minSdk = Version.Android.minSdk
+        targetSdk = Version.Android.targetSdk
         versionCode = 1
         versionName = "1.0"
 
@@ -36,14 +36,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
 
     buildFeatures.compose = true
 
     composeOptions {
         kotlinCompilerExtensionVersion = Version.compose
-        kotlinCompilerVersion = Version.kotlin
     }
 }
 

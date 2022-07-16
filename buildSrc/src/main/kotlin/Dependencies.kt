@@ -4,12 +4,12 @@ object Dependencies {
         const val appCompat = "androidx.appcompat:appcompat:1.3.0"
         const val material = "com.google.android.material:material:1.3.0"
 
-        const val composeUI = "androidx.compose.ui:ui:${Version.compose}"
-        const val composeUITooling = "androidx.compose.ui:ui-tooling:${Version.compose}"
-        const val composeMaterial = "androidx.compose.material:material:${Version.compose}"
-        const val rxJava3 = "androidx.compose.runtime:runtime-rxjava3:${Version.compose}"
-        const val composeActivity = "androidx.activity:activity-compose:1.3.0-beta01"
-        const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha02"
+        const val composeUI = "androidx.compose.ui:ui:${Version.composeLib}"
+        const val composeUITooling = "androidx.compose.ui:ui-tooling:${Version.composeLib}"
+        const val composeMaterial = "androidx.compose.material:material:${Version.composeLib}"
+        const val rxJava3 = "androidx.compose.runtime:runtime-rxjava3:${Version.composeLib}"
+        const val composeActivity = "androidx.activity:activity-compose:1.5.0"
+        const val navigation = "androidx.navigation:navigation-compose:2.5.0"
 
         const val lifecycleKts = "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
     }
@@ -37,15 +37,16 @@ object Dependencies {
 }
 
 object Version {
-    const val kotlin = "1.5.10"
+    const val kotlin = "1.7.0"
     const val jUnit5 = "5.3.1"
-    const val compose = "1.0.0"
+    const val compose = "1.2.0"
+    const val composeLib = "1.2.0-rc03"
     const val koin = "3.0.2"
 
     object Android {
         const val buildTool = "30.0.3"
         const val minSdk = 23
-        const val targetSdk = 30
-        const val compileSdk = 30
+        const val targetSdk = 32
+        const val compileSdk = 32
     }
 }
