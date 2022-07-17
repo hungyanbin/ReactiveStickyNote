@@ -24,8 +24,8 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             ReactiveStickyNoteTheme {
-                NavHost(navController, startDestination = Screen.Board.route) {
-                    composable(Screen.Board.route) {
+                NavHost(navController, startDestination = Screen.Editor.route) {
+                    composable(Screen.Editor.route) {
                         val viewModel by viewModel<EditorViewModel>()
                         EditorScreen(
                             viewModel = viewModel,
@@ -47,7 +47,6 @@ class MainActivity : ComponentActivity() {
                         EditTextScreen(viewModel, onLeaveScreen = { navController.popBackStack() })
                     }
                 }
-
             }
         }
     }
