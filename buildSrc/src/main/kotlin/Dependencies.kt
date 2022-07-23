@@ -31,8 +31,7 @@ object Dependencies {
 
     object Test {
         const val jUnit4 = "junit:junit:4.+"
-        const val jUnit5 = "org.junit.jupiter:junit-jupiter-api:${Version.jUnit5}"
-        const val jUnit5Engine = "org.junit.jupiter:junit-jupiter-engine:${Version.jUnit5}"
+        const val mockk = "io.mockk:mockk:${Version.mockk}"
     }
 }
 
@@ -42,6 +41,7 @@ object Version {
     const val compose = "1.2.0"
     const val composeLib = "1.2.0-rc03"
     const val koin = "3.0.2"
+    const val mockk = "1.12.4"
 
     object Android {
         const val buildTool = "30.0.3"

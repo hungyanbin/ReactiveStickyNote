@@ -64,6 +64,9 @@ dependencies {
     // Firebase
     implementation(platform(Dependencies.Firebase.bom))
     implementation (Dependencies.Firebase.firestore)
+    // Test
+    testImplementation(Dependencies.Test.jUnit4)
+    testImplementation(Dependencies.Test.mockk)
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
