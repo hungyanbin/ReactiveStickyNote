@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Activity
+class Fragment
+interface ViewModelStoreOwner {
+    + getViewModelStore(): ViewModelStore
+}
+
+class ViewModelStore {
+    + put(key: String, viewModel: ViewModel)
+    + get(key: String): ViewModel
+    + clear()
+}
+
+class ViewModel {
+    + onCleared()
+}
+
+Activity --|> ViewModelStoreOwner
+Fragment --|> ViewModelStoreOwner
+ViewModelStoreOwner --> ViewModelStore
+ViewModelStore --> ViewModel
+
+hide empty members
+
+@enduml
