@@ -63,9 +63,8 @@ class EditorViewModel(
     }
 
     fun onDeleteClicked() {
-        val selectingNoteId = selectingNoteIdSubject.value
-        if (selectingNoteId.isNotEmpty()) {
-            noteRepository.deleteNote(selectingNoteId)
+        runOnSelectingNote { note ->
+            noteRepository.deleteNote(note.id)
             selectingNoteIdSubject.onNext("")
         }
     }
