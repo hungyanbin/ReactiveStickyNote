@@ -47,7 +47,9 @@ class EditTextViewModelTest {
         viewModel.onTextChanged("text1 changed")
         viewModel.onConfirmClicked()
 
-        verify { noteRepository.putNote(note.copy(text = "text1 changed")) }
+        verify { noteRepository.putNote(
+            Note(id = "1", text = "text1 changed", position = Position(0f, 0f), color = YBColor.Aquamarine)
+        ) }
     }
 
     @Test

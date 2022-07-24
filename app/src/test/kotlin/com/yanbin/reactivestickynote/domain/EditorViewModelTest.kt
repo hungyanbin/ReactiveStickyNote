@@ -8,7 +8,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
 import org.junit.Test
 import java.util.*
 
@@ -23,19 +22,6 @@ internal class EditorViewModelTest {
         val viewModel = EditorViewModel(noteRepository)
         val testObserver = viewModel.allNotes.test()
         testObserver.assertValue(fakeNotes())
-    }
-
-    @Test
-    fun `loadStickyNote reactively`() {
-        val notesSubject = BehaviorSubject.createDefault(listOf<Note>())
-        every { noteRepository.getAllNotes() } returns notesSubject
-
-        val viewModel = EditorViewModel(noteRepository)
-        val testObserver = viewModel.allNotes.test()
-        notesSubject.onNext(fakeNotes())
-
-        testObserver.assertValueAt(0, emptyList())
-        testObserver.assertValueAt(1, fakeNotes())
     }
 
     @Test
@@ -160,7 +146,9 @@ internal class EditorViewModelTest {
         viewModel.tapNote(tappedNote)
         viewModel.onColorSelected(selectedColor)
 
-        verify { noteRepository.putNote(tappedNote.copy(color = selectedColor)) }
+        verify { noteRepository.putNote(
+            Note(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.PaleCanary)
+        ) }
     }
 
     private fun fakeNotes(): List<Note> {
