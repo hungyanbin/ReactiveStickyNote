@@ -33,6 +33,7 @@ class EditTextViewModel(
             .withLatestFrom(text) { note, text ->
                 note.copy(text = text)
             }
+            .firstElement()
             .subscribe { newNote ->
                 noteRepository.putNote(stickyNote = newNote)
                 leavePageSubject.onNext(Unit)
