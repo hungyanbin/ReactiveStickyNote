@@ -1,10 +1,9 @@
 package com.yanbin.reactivestickynote.domain
 
 import com.yanbin.reactivestickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.YBColor
-import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -15,27 +14,24 @@ import java.util.*
 internal class EditorViewModelTest {
 
     private val noteRepository = mockk<NoteRepository>(relaxed = true)
-    private val noteEditor = NoteEditor(noteRepository)
+    private val stickyNoteEditor = StickyNoteEditor(noteRepository)
 
     @Test
     fun loadStickyNoteTest() {
-        every { noteRepository.getAllVisibleNoteIds() } returns Observable.just(fakeNotes().map { it.id })
+        every { noteRepository.getAllVisibleNoteIds() } returns Observable.just(fakeNoteIds())
 
-        val viewModel = EditorViewModel(noteEditor)
-        val testObserver = viewModel.allVisibleNoteIds.test()
-        testObserver.assertValue(fakeNotes().map { it.id })
+        val testObserver = stickyNoteEditor.allVisibleNoteIds.test()
+        testObserver.assertValue(fakeNoteIds())
     }
 
     @Test
     fun `move note 1 with delta position (40, 40), expect noteRepository put Note with position (40, 40)`() {
         every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteEditor)
-
-        viewModel.moveNote("1", Position(40f, 40f))
+        stickyNoteEditor.moveNote("1", Position(40f, 40f))
 
         verify { noteRepository.putNote(
-            Note(id = "1", text = "text1", position = Position(40f, 40f), color = YBColor.Aquamarine)
+            StickyNote(id = "1", text = "text1", position = Position(40f, 40f), color = YBColor.Aquamarine)
         ) }
     }
 
@@ -43,19 +39,16 @@ internal class EditorViewModelTest {
     fun `move note 2 with delta position (40, 40), expect noteRepository put Note with position (50, 50)`() {
         every { noteRepository.getNoteById("2") } returns Observable.just(fakeNotes()[1])
 
-        val viewModel = EditorViewModel(noteEditor)
-
-        viewModel.moveNote("2", Position(40f, 40f))
+        stickyNoteEditor.moveNote("2", Position(40f, 40f))
 
         verify { noteRepository.putNote(
-            Note(id = "2", text = "text2", position = Position(50f, 50f), color = YBColor.Gorse)
+            StickyNote(id = "2", text = "text2", position = Position(50f, 50f), color = YBColor.Gorse)
         ) }
     }
 
     @Test
     fun `addNewNote called expect noteRepository add new note`() {
-        val viewModel = EditorViewModel(noteEditor)
-        viewModel.addNewNote()
+        stickyNoteEditor.addNewNote()
 
         verify { noteRepository.createNote(any()) }
     }
@@ -64,33 +57,32 @@ internal class EditorViewModelTest {
     fun `tapNote called expect select the tapped note`() {
         every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteEditor)
-        val selectingNoteObserver = viewModel.selectingNote.test()
+        val selectingNoteObserver = stickyNoteEditor.selectedNote.test()
         val tappedNote = fakeNotes()[0]
-        viewModel.tapNote(tappedNote)
+        stickyNoteEditor.selectNote("1")
 
         selectingNoteObserver.assertValueAt(0, Optional.empty())
         selectingNoteObserver.assertValueAt(1, Optional.of(tappedNote))
     }
 
     @Test
-    fun `tapCanvas called expect clear the selected note`() {
+    fun `clearSelection called expect clear the selected note`() {
         every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val viewModel = EditorViewModel(noteEditor)
-        val selectingNoteObserver = viewModel.selectingNote.test()
-        val tappedNote = fakeNotes()[0]
-        viewModel.tapNote(tappedNote)
-        viewModel.tapCanvas()
+        val selectingNoteObserver = stickyNoteEditor.selectedNote.test()
+        stickyNoteEditor.selectNote("1")
+        stickyNoteEditor.clearSelection()
 
         selectingNoteObserver.assertValueAt(2, Optional.empty())
     }
 
-    private fun fakeNotes(): List<Note> {
+    private fun fakeNoteIds() = fakeNotes().map { it.id }
+
+    private fun fakeNotes(): List<StickyNote> {
         return listOf(
-            Note(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine),
-            Note(id = "2", text = "text2", position = Position(10f, 10f), color = YBColor.Gorse),
-            Note(id = "3", text = "text3", position = Position(20f, 20f), color = YBColor.HotPink),
+            StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine),
+            StickyNote(id = "2", text = "text2", position = Position(10f, 10f), color = YBColor.Gorse),
+            StickyNote(id = "3", text = "text3", position = Position(20f, 20f), color = YBColor.HotPink),
         )
     }
 }

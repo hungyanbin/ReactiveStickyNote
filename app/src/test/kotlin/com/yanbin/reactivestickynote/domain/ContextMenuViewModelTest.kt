@@ -1,74 +1,90 @@
 package com.yanbin.reactivestickynote.domain
 
-import com.yanbin.reactivestickynote.model.Note
+import com.yanbin.reactivestickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.model.Position
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.YBColor
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.rxjava3.core.Observable
+import org.junit.Before
 import org.junit.Test
 import java.util.*
 
-// Implement With NoteEditor
 class ContextMenuViewModelTest {
 
-//    @Test
-//    fun `onDeleteClicked called expect clear the selected note`() {
-//        val viewModel = ContextMenuViewModel(contextMenu)
-//        val selectingNoteObserver = viewModel.selectingNote.test()
-//        viewModel.tapNote(tappedNote)
-//        viewModel.onDeleteClicked()
-//
-//        selectingNoteObserver.assertValueAt(2, Optional.empty())
-//    }
+    private val noteRepository = mockk<NoteRepository>(relaxed = true)
+    private val stickyNoteEditor = StickyNoteEditor(noteRepository)
 
-//    @Test
-//    fun `onDeleteClicked called expect delete the note in noteRepository`() {
-//        val viewModel = EditorViewModel(noteEditor)
-//        val tappedNote = fakeNotes()[0]
-//        viewModel.tapNote(tappedNote)
-//        viewModel.onDeleteClicked()
-//
-//        verify { noteRepository.deleteNote(tappedNote.id) }
-//    }
-//
-//    @Test
-//    fun `onEditTextClicked called expect openEditTextScreen`() {
-//        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
-//
-//        val viewModel = EditorViewModel(noteEditor)
-//        val openEditTextScreenObserver = viewModel.openEditTextScreen.test()
-//        val tappedNote = fakeNotes()[0]
-//        viewModel.tapNote(tappedNote)
-//        viewModel.onEditTextClicked()
-//
-//        openEditTextScreenObserver.assertValue(tappedNote)
-//    }
-//
-//    @Test
-//    fun `tapNote called expect showing correct selectingColor`() {
-//        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
-//
-//        val viewModel = EditorViewModel(noteEditor)
-//        val selectingColorObserver = viewModel.selectingColor.test()
-//        val tappedNote = fakeNotes()[0]
-//        viewModel.tapNote(tappedNote)
-//
-//        selectingColorObserver.assertValue(tappedNote.color)
-//    }
-//
-//    @Test
-//    fun `onColorSelected called expect update note with selected color`() {
-//        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
-//        val selectedColor = YBColor.PaleCanary
-//
-//        val viewModel = EditorViewModel(noteEditor)
-//        val tappedNote = fakeNotes()[0]
-//        viewModel.tapNote(tappedNote)
-//        viewModel.onColorSelected(selectedColor)
-//
-//        verify { noteRepository.putNote(
-//            Note(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.PaleCanary)
-//        ) }
-//    }
+    @Before
+    fun setUp() {
+        stickyNoteEditor.start()
+    }
+
+    @Test
+    fun `onDeleteClicked called expect clear the selected note`() {
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
+
+        val selectingNoteObserver = stickyNoteEditor.selectedNote.test()
+        stickyNoteEditor.selectNote("1")
+        stickyNoteEditor.contextMenu.onDeleteClicked()
+
+        selectingNoteObserver.assertValueAt(2, Optional.empty())
+    }
+
+    @Test
+    fun `onDeleteClicked called expect delete the note in noteRepository`() {
+        every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
+
+        stickyNoteEditor.selectNote("1")
+        stickyNoteEditor.contextMenu.onDeleteClicked()
+
+        verify { noteRepository.deleteNote("1") }
+    }
+
+    @Test
+    fun `onEditTextClicked called expect openEditTextScreen`() {
+        val tappedNote = StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine)
+        every { noteRepository.getNoteById("1") } returns Observable.just(tappedNote)
+
+        val openEditTextScreenObserver = stickyNoteEditor.openEditTextScreen.test()
+        stickyNoteEditor.selectNote("1")
+        stickyNoteEditor.contextMenu.onEditTextClicked()
+
+        openEditTextScreenObserver.assertValue(tappedNote)
+    }
+
+    @Test
+    fun `tapNote called expect showing correct selectingColor`() {
+        val tappedNote = StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine)
+        every { noteRepository.getNoteById("1") } returns Observable.just(tappedNote)
+
+        val selectingColorObserver = stickyNoteEditor.contextMenu.selectedColor.test()
+        stickyNoteEditor.selectNote("1")
+
+        selectingColorObserver.assertValue(YBColor.Aquamarine)
+    }
+
+    @Test
+    fun `onColorSelected called expect update note with selected color`() {
+        val tappedNote = StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine)
+        every { noteRepository.getNoteById("1") } returns Observable.just(tappedNote)
+        val selectedColor = YBColor.PaleCanary
+
+        stickyNoteEditor.selectNote("1")
+        stickyNoteEditor.contextMenu.onColorSelected(selectedColor)
+
+        verify { noteRepository.putNote(
+            StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.PaleCanary)
+        ) }
+    }
+
+    private fun fakeNotes(): List<StickyNote> {
+        return listOf(
+            StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine),
+            StickyNote(id = "2", text = "text2", position = Position(10f, 10f), color = YBColor.Gorse),
+            StickyNote(id = "3", text = "text3", position = Position(20f, 20f), color = YBColor.HotPink),
+        )
+    }
 }

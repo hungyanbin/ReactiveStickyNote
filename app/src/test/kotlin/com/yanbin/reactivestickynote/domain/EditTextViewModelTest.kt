@@ -1,8 +1,8 @@
 package com.yanbin.reactivestickynote.domain
 
 import com.yanbin.reactivestickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
+import com.yanbin.reactivestickynote.model.StickyNote
 import com.yanbin.reactivestickynote.model.YBColor
 import io.mockk.every
 import io.mockk.mockk
@@ -18,8 +18,6 @@ class EditTextViewModelTest {
 
     @Test
     fun `load correct text from start`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
-
         val viewModel = EditTextViewModel(noteRepository, noteId, defaultText)
         val textObserver = viewModel.text.test()
 
@@ -28,8 +26,6 @@ class EditTextViewModelTest {
 
     @Test
     fun `change text expect show the correct text`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
-
         val viewModel = EditTextViewModel(noteRepository, noteId, defaultText)
         val textObserver = viewModel.text.test()
         viewModel.onTextChanged("text1 changed")
@@ -39,8 +35,7 @@ class EditTextViewModelTest {
 
     @Test
     fun `onConfirmClicked expect update note with new text`() {
-        val note = fakeNotes().find { it.id == noteId }!!
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        val note = StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine)
         every { noteRepository.getNoteById(noteId) } returns Observable.just(note)
 
         val viewModel = EditTextViewModel(noteRepository, noteId, defaultText)
@@ -48,14 +43,13 @@ class EditTextViewModelTest {
         viewModel.onConfirmClicked()
 
         verify { noteRepository.putNote(
-            Note(id = "1", text = "text1 changed", position = Position(0f, 0f), color = YBColor.Aquamarine)
+            StickyNote(id = "1", text = "text1 changed", position = Position(0f, 0f), color = YBColor.Aquamarine)
         ) }
     }
 
     @Test
     fun `onConfirmClicked expect leave page`() {
-        val note = fakeNotes().find { it.id == noteId }!!
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
+        val note = StickyNote(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine)
         every { noteRepository.getNoteById(noteId) } returns Observable.just(note)
 
         val viewModel = EditTextViewModel(noteRepository, noteId, defaultText)
@@ -68,20 +62,10 @@ class EditTextViewModelTest {
 
     @Test
     fun `onCancelClicked expect leave page`() {
-        every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
-
         val viewModel = EditTextViewModel(noteRepository, noteId, defaultText)
         val leavePageObserver = viewModel.leavePage.test()
         viewModel.onCancelClicked()
 
         leavePageObserver.assertValue(Unit)
-    }
-
-    private fun fakeNotes(): List<Note> {
-        return listOf(
-            Note(id = "1", text = "text1", position = Position(0f, 0f), color = YBColor.Aquamarine),
-            Note(id = "2", text = "text2", position = Position(10f, 10f), color = YBColor.Gorse),
-            Note(id = "3", text = "text3", position = Position(20f, 20f), color = YBColor.HotPink),
-        )
     }
 }
