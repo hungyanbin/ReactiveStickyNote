@@ -11,6 +11,10 @@ fun <T> Observable<T>.fromIO(): Observable<T> {
     return this.subscribeOn(Schedulers.io())
 }
 
+fun <T> Single<T>.fromIO(): Single<T> {
+    return this.subscribeOn(Schedulers.io())
+}
+
 fun <T> Observable<T>.toIO(): Observable<T> {
     return this.observeOn(Schedulers.io())
 }

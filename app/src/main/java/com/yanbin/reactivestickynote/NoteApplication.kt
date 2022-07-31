@@ -1,6 +1,7 @@
 package com.yanbin.reactivestickynote
 
 import android.app.Application
+import com.yanbin.reactivestickynote.di.getLoginModule
 import com.yanbin.reactivestickynote.di.getNoteModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -16,7 +17,8 @@ class NoteApplication: Application() {
             androidContext(this@NoteApplication)
             // use modules
             modules(
-                getNoteModule()
+                getNoteModule(),
+                getLoginModule()
             )
         }
     }

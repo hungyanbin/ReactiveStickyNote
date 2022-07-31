@@ -1,6 +1,7 @@
 package com.yanbin.reactivestickynote.ui.screen
 
 sealed class Screen(val route: String) {
+    object Login : Screen("login")
     object Editor : Screen("editor")
     object EditText : Screen("editText/{noteId}?defaultText={defaultText}") {
         fun buildRoute(noteId: String, defaultText: String) = "editText/${noteId}?${KEY_DEFAULT_TEXT}=${defaultText}"
