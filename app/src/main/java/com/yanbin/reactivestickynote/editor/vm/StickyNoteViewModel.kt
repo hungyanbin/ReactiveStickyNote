@@ -3,9 +3,8 @@ package com.yanbin.reactivestickynote.editor.vm
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.Position
-import com.yanbin.reactivestickynote.editor.model.StickyNote
-import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.Observables
 
 class StickyNoteViewModel(
     private val stickyNoteEditor: StickyNoteEditor
@@ -19,16 +18,12 @@ class StickyNoteViewModel(
         stickyNoteEditor.selectNote(id)
     }
 
-    fun getNoteById(id: String): Observable<StickyNoteUiModel> = stickyNoteEditor.getNoteById(id)
-        .map { StickyNoteUiModel(it, StickyNoteUiModel.State.Normal) }
-
-    fun isSelected(id: String): Observable<Boolean> {
-        return stickyNoteEditor.selectedNote
-            .map { optNote ->
-                optNote.fold(
-                    someFun = { note -> note.id == id},
-                    emptyFun = { false }
-                )
+    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(stickyNoteEditor.getNoteById(id), stickyNoteEditor.userSelectedNote)
+        .map { (note, userSelectedNote) ->
+            if (userSelectedNote.isPresent && note.id == userSelectedNote.get().noteId) {
+                StickyNoteUiModel(note, StickyNoteUiModel.State.Selected(userSelectedNote.get().userName))
+            } else {
+                StickyNoteUiModel(note, StickyNoteUiModel.State.Normal)
             }
-    }
+        }
 }

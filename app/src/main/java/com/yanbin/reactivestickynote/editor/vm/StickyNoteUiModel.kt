@@ -11,6 +11,12 @@ data class StickyNoteUiModel(
     val position = stickyNote.position
     val color = stickyNote.color
     val text = stickyNote.text
+    val isSelected = state is State.Selected
+    val selectedUserName = if (state is State.Selected) {
+        state.displayName
+    } else {
+        ""
+    }
 
     sealed class State {
         class Selected(val displayName: String): State()

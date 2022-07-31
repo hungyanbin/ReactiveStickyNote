@@ -22,15 +22,13 @@ class StickyNoteEditor(
     private val _showContextMenu = BehaviorSubject.createDefault(false)
     private val _showAddButton = BehaviorSubject.createDefault(true)
     private val openEditTextScreenSignal = PublishSubject.create<Unit>()
-//    private val selectedNoteId = BehaviorSubject.createDefault(Optional.empty<String>())
-
 
     val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes()
     val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
     val showAddButton: Observable<Boolean> = _showAddButton.hide()
 
-    private val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
+    val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
         Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
     }
 

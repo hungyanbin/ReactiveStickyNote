@@ -15,7 +15,7 @@ fun ViewPortView(
         noteIds.forEach { id ->
             key(id) {
                 StatefulStickyNoteView(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier,
                     id = id
                 )
             }
