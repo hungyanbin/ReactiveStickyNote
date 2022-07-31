@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.ui.screen
+package com.yanbin.reactivestickynote.ui.route
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -19,8 +19,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.model.StickyNote
-import com.yanbin.reactivestickynote.ui.vm.EditorViewModel
+import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
 import com.yanbin.reactivestickynote.ui.view.ViewPortView
 import com.yanbin.reactivestickynote.ui.view.StatefulContextMenuView
 import com.yanbin.utils.subscribeBy

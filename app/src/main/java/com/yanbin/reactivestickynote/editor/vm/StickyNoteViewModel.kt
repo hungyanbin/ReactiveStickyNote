@@ -1,9 +1,9 @@
-package com.yanbin.reactivestickynote.ui.vm
+package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.domain.StickyNoteEditor
-import com.yanbin.reactivestickynote.model.Position
-import com.yanbin.reactivestickynote.model.StickyNote
+import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.editor.model.StickyNote
 import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 

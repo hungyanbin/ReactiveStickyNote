@@ -1,7 +1,7 @@
-package com.yanbin.reactivestickynote.domain
+package com.yanbin.reactivestickynote.editor.domain
 
-import com.yanbin.reactivestickynote.model.StickyNote
-import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.editor.model.YBColor
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*

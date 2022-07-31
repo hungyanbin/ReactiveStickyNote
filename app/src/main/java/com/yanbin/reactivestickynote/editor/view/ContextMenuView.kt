@@ -24,8 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.ui.vm.ContextMenuViewModel
-import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.reactivestickynote.editor.vm.ContextMenuViewModel
+import com.yanbin.reactivestickynote.editor.model.YBColor
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @Composable

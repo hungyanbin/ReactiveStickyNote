@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.model
+package com.yanbin.reactivestickynote.editor.model
 
 data class Position(val x: Float, val y: Float) {
 

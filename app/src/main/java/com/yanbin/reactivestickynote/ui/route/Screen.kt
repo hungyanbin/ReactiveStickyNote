@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.ui.screen
+package com.yanbin.reactivestickynote.ui.route
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")

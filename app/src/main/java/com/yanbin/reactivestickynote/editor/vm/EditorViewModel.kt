@@ -1,8 +1,8 @@
-package com.yanbin.reactivestickynote.ui.vm
+package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.domain.StickyNoteEditor
-import com.yanbin.reactivestickynote.model.StickyNote
+import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.editor.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 
 class EditorViewModel(

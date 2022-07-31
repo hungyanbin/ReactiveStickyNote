@@ -1,6 +1,6 @@
-package com.yanbin.reactivestickynote.data
+package com.yanbin.reactivestickynote.editor.data
 
-import com.yanbin.reactivestickynote.model.StickyNote
+import com.yanbin.reactivestickynote.editor.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 
 interface NoteRepository {

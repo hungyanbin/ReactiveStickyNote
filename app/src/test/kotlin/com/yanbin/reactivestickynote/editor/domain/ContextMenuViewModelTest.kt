@@ -1,9 +1,9 @@
-package com.yanbin.reactivestickynote.domain
+package com.yanbin.reactivestickynote.editor.domain
 
-import com.yanbin.reactivestickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.model.Position
-import com.yanbin.reactivestickynote.model.StickyNote
-import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.reactivestickynote.editor.data.NoteRepository
+import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.editor.model.YBColor
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

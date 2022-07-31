@@ -1,11 +1,11 @@
-package com.yanbin.reactivestickynote.data
+package com.yanbin.reactivestickynote.editor.data
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.*
-import com.yanbin.reactivestickynote.model.StickyNote
-import com.yanbin.reactivestickynote.model.Position
-import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.editor.model.YBColor
 import com.yanbin.utils.toIO
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject

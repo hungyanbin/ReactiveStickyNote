@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.model
+package com.yanbin.reactivestickynote.editor.model
 
 import java.util.*
 import kotlin.random.Random

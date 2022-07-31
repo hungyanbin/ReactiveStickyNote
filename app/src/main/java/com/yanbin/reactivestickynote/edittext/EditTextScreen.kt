@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.ui.screen
+package com.yanbin.reactivestickynote.ui.route
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.domain.EditTextViewModel
+import com.yanbin.reactivestickynote.edittext.EditTextViewModel
 import com.yanbin.reactivestickynote.ui.theme.TransparentBlack
 import com.yanbin.utils.subscribeBy
 import com.yanbin.utils.toMain

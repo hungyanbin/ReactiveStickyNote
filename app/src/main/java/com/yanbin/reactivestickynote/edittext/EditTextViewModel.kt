@@ -1,8 +1,7 @@
-package com.yanbin.reactivestickynote.domain
+package com.yanbin.reactivestickynote.edittext
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.model.StickyNote
+import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo

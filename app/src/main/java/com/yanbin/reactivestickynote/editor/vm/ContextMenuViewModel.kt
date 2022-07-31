@@ -1,8 +1,8 @@
-package com.yanbin.reactivestickynote.ui.vm
+package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.domain.ContextMenu
-import com.yanbin.reactivestickynote.model.YBColor
+import com.yanbin.reactivestickynote.editor.domain.ContextMenu
+import com.yanbin.reactivestickynote.editor.model.YBColor
 
 class ContextMenuViewModel(
     private val contextMenu: ContextMenu
