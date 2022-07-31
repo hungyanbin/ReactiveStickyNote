@@ -1,5 +1,6 @@
 package com.yanbin.reactivestickynote.editor.data
 
+import com.yanbin.reactivestickynote.editor.model.SelectedNote
 import com.yanbin.reactivestickynote.editor.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -10,6 +11,8 @@ class InMemoryNoteRepository: NoteRepository {
 
     private val notes = BehaviorSubject.createDefault(emptyList<StickyNote>())
     private val noteMap = ConcurrentHashMap<String, StickyNote>()
+    private val selectedNotes = BehaviorSubject.createDefault(emptyList<SelectedNote>())
+    private val selectedNoteMap = ConcurrentHashMap<String, SelectedNote>()
 
     override fun putNote(stickyNote: StickyNote) {
         noteMap[stickyNote.id] = stickyNote
@@ -32,6 +35,20 @@ class InMemoryNoteRepository: NoteRepository {
 
     override fun getAllVisibleNoteIds(): Observable<List<String>> {
         return notes.map { notes -> notes.map { it.id } }
+    }
+
+    override fun getAllSelectedNotes(): Observable<List<SelectedNote>> {
+        return selectedNotes.hide()
+    }
+
+    override fun addNoteSelection(noteId: String, userName: String) {
+        selectedNoteMap[noteId] = SelectedNote(noteId, userName)
+        selectedNotes.onNext(selectedNoteMap.elements().toList())
+    }
+
+    override fun removeNoteSelection(noteId: String) {
+        selectedNoteMap.remove(noteId)
+        selectedNotes.onNext(selectedNoteMap.elements().toList())
     }
 
     init {

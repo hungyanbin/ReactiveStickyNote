@@ -15,11 +15,12 @@ class StickyNoteViewModel(
         stickyNoteEditor.moveNote(noteId, positionDelta)
     }
 
-    fun tapNote(stickyNote: StickyNote) {
-        stickyNoteEditor.selectNote(stickyNote.id)
+    fun tapNote(id: String) {
+        stickyNoteEditor.selectNote(id)
     }
 
-    fun getNoteById(id: String) = stickyNoteEditor.getNoteById(id)
+    fun getNoteById(id: String): Observable<StickyNoteUiModel> = stickyNoteEditor.getNoteById(id)
+        .map { StickyNoteUiModel(it, StickyNoteUiModel.State.Normal) }
 
     fun isSelected(id: String): Observable<Boolean> {
         return stickyNoteEditor.selectedNote

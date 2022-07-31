@@ -1,9 +1,12 @@
 package com.yanbin.reactivestickynote.editor.domain
 
+import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.model.StickyNote
 import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.editor.model.SelectedNote
 import com.yanbin.reactivestickynote.editor.model.YBColor
+import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -12,32 +15,38 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
 class StickyNoteEditor(
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val accountService: AccountService
 ) {
 
     private val _showContextMenu = BehaviorSubject.createDefault(false)
     private val _showAddButton = BehaviorSubject.createDefault(true)
     private val openEditTextScreenSignal = PublishSubject.create<Unit>()
-    private val selectedNoteId = BehaviorSubject.createDefault(Optional.empty<String>())
+//    private val selectedNoteId = BehaviorSubject.createDefault(Optional.empty<String>())
+
+
+    val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes()
+    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
+    val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
+    val showAddButton: Observable<Boolean> = _showAddButton.hide()
+
+    private val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
+        Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
+    }
 
     // State
-    val selectedNote: Observable<Optional<StickyNote>> = selectedNoteId
-        .switchMap { optId ->
-            if (optId.isPresent) {
-                noteRepository.getNoteById(optId.get())
+    val selectedNote: Observable<Optional<StickyNote>> = userSelectedNote
+        .switchMap { optSelectedNote ->
+            if (optSelectedNote.isPresent) {
+                noteRepository.getNoteById(optSelectedNote.get().noteId)
                     .map { Optional.ofNullable(it) }
             } else {
                 Observable.just(Optional.empty())
             }
         }
-
-    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
-    val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
-    val showAddButton: Observable<Boolean> = _showAddButton.hide()
     val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.withLatestFrom(selectedNote) { _, optNote ->
         optNote
     }.mapOptional { it }
-
 
     // Component
     val contextMenu = ContextMenu(selectedNote)
@@ -61,19 +70,59 @@ class StickyNoteEditor(
     }
 
     fun selectNote(noteId: String) {
-        if (selectedNoteId.value.isPresent && selectedNoteId.value.get() == noteId) {
-            clearSelection()
-        } else {
-            selectedNoteId.onNext(Optional.of(noteId))
-            _showAddButton.onNext(false)
-            _showContextMenu.onNext(true)
-        }
+        Observable.just(noteId)
+            .withLatestFrom(userSelectedNote) { id, selectedNote ->
+                id to selectedNote
+            }
+            .firstElement()
+            .subscribe { (id, selectedNote) ->
+                selectedNote.fold(
+                    someFun = { note ->
+                        if (note.noteId == id) {
+                            setNoteUnSelected(id)
+                            showAddButton()
+                        } else {
+                            setNoteUnSelected(note.noteId)
+                            setNoteSelected(id)
+                            showContextMenu()
+                        }
+                    },
+                    emptyFun = {
+                        setNoteSelected(id)
+                        showContextMenu()
+                    }
+                )
+            }
+            .addTo(disposableBag)
+    }
+
+    private fun setNoteSelected(id: String) {
+        noteRepository.addNoteSelection(id, accountService.getCurrentAccount().userName)
+    }
+
+    private fun setNoteUnSelected(id: String) {
+        noteRepository.removeNoteSelection(id)
+    }
+
+    private fun showAddButton() {
+        _showAddButton.onNext(true)
+        _showContextMenu.onNext(false)
+    }
+
+    private fun showContextMenu() {
+        _showAddButton.onNext(false)
+        _showContextMenu.onNext(true)
     }
 
     fun clearSelection() {
-        selectedNoteId.onNext(Optional.empty())
-        _showAddButton.onNext(true)
-        _showContextMenu.onNext(false)
+        userSelectedNote
+            .take(1)
+            .mapOptional { it }
+            .subscribe { selectedNote ->
+                setNoteUnSelected(selectedNote.noteId)
+                showAddButton()
+            }
+            .addTo(disposableBag)
     }
 
     fun getNoteById(id: String): Observable<StickyNote> {
@@ -87,9 +136,22 @@ class StickyNoteEditor(
 
     fun moveNote(noteId: String, positionDelta: Position) {
         Observable.just(positionDelta)
-            .withLatestFrom(noteRepository.getNoteById(noteId)) { delta, note ->
-                note.copy(position = note.position + delta)
+            .withLatestFrom(userSelectedNote, noteRepository.getNoteById(noteId)) { delta, optSelectedNote, note ->
+                optSelectedNote.fold(
+                    someFun = {
+                        // Can move
+                        if (it.noteId == noteId) {
+                            note.copy(position = note.position + delta)
+                        } else {
+                            null
+                        }
+                    },
+                    emptyFun = {
+                        null
+                    }
+                ).let { Optional.ofNullable(it) }
             }
+            .mapOptional { it }
             .subscribe { note ->
                 noteRepository.putNote(note)
             }
@@ -101,10 +163,13 @@ class StickyNoteEditor(
     }
 
     private fun deleteNote() {
-        selectedNoteId.value?.ifPresent { id ->
-            noteRepository.deleteNote(id)
-            clearSelection()
-        }
+        userSelectedNote.take(1)
+            .mapOptional { it }
+            .subscribe { selectedNote ->
+                noteRepository.deleteNote(selectedNote.noteId)
+                clearSelection()
+            }
+            .addTo(disposableBag)
     }
 
     private fun changeColor(color: YBColor) {

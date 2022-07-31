@@ -50,7 +50,8 @@ fun getNoteModule() =
         }
 
         single { StickyNoteEditor(
-            noteRepository = get()
+            noteRepository = get(),
+            accountService = get()
         ) }
 
         viewModel {

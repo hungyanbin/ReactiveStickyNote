@@ -5,12 +5,14 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.*
 import com.yanbin.reactivestickynote.editor.model.StickyNote
 import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.editor.model.SelectedNote
 import com.yanbin.reactivestickynote.editor.model.YBColor
 import com.yanbin.utils.toIO
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class FirebaseNoteRepository : NoteRepository {
@@ -94,6 +96,23 @@ class FirebaseNoteRepository : NoteRepository {
         firestore.collection(COLLECTION_NOTES)
             .document(noteId)
             .delete()
+    }
+
+    private val selectedNotes = BehaviorSubject.createDefault(emptyList<SelectedNote>())
+    private val selectedNoteMap = ConcurrentHashMap<String, SelectedNote>()
+
+    override fun getAllSelectedNotes(): Observable<List<SelectedNote>> {
+        return selectedNotes.hide()
+    }
+
+    override fun addNoteSelection(noteId: String, userName: String) {
+        selectedNoteMap[noteId] = SelectedNote(noteId, userName)
+        selectedNotes.onNext(selectedNoteMap.elements().toList())
+    }
+
+    override fun removeNoteSelection(noteId: String) {
+        selectedNoteMap.remove(noteId)
+        selectedNotes.onNext(selectedNoteMap.elements().toList())
     }
 
     private fun createDocumentRef(id: String): DocumentReference {

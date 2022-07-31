@@ -13,7 +13,7 @@ import com.yanbin.reactivestickynote.login.LoginScreen
 import com.yanbin.reactivestickynote.login.LoginViewModel
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
 import com.yanbin.reactivestickynote.ui.route.EditTextScreen
-import com.yanbin.reactivestickynote.ui.route.StickyNoteEditorScreen
+import com.yanbin.reactivestickynote.editor.view.StickyNoteEditorScreen
 import com.yanbin.reactivestickynote.ui.route.Screen
 import com.yanbin.reactivestickynote.ui.theme.ReactiveStickyNoteTheme
 import org.koin.android.ext.android.inject

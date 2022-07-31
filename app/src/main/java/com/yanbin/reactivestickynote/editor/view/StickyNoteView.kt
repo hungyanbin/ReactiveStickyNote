@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.ui.view
+package com.yanbin.reactivestickynote.editor.view
 
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.border
@@ -21,8 +21,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import com.yanbin.reactivestickynote.editor.model.StickyNote
 import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.editor.vm.StickyNoteUiModel
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -35,14 +35,14 @@ fun StatefulStickyNoteView(
     val onPositionChanged: (Position) -> Unit = { delta ->
         stickyNoteViewModel.moveNote(id, delta)
     }
-    val note by stickyNoteViewModel.getNoteById(id).subscribeAsState(initial = StickyNote.createEmptyNote(id))
+    val noteUiModel by stickyNoteViewModel.getNoteById(id).subscribeAsState(initial = StickyNoteUiModel.emptyUiModel(id))
     val selected: Boolean by stickyNoteViewModel.isSelected(id).subscribeAsState(false)
 
     StickyNoteView(
         modifier = modifier,
         onPositionChanged = onPositionChanged,
         onClick = stickyNoteViewModel::tapNote,
-        stickyNote = note,
+        stickyNote = noteUiModel,
         selected = selected)
 }
 
@@ -59,8 +59,8 @@ private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show
 fun StickyNoteView(
     modifier: Modifier = Modifier,
     onPositionChanged: (Position) -> Unit = {},
-    onClick: (StickyNote) -> Unit,
-    stickyNote: StickyNote,
+    onClick: (String) -> Unit,
+    stickyNote: StickyNoteUiModel,
     selected: Boolean,
 ) {
     val offset by animateIntOffsetAsState(
@@ -78,7 +78,7 @@ fun StickyNoteView(
         elevation = 8.dp
     ) {
         Column(modifier = Modifier
-            .clickable { onClick(stickyNote) }
+            .clickable { onClick(stickyNote.id) }
             .pointerInput(stickyNote.id) {
                 detectDragGestures { change, dragAmount ->
                     change.consumeAllChanges()

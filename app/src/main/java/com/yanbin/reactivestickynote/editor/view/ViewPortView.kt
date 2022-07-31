@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.ui.view
+package com.yanbin.reactivestickynote.editor.view
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
