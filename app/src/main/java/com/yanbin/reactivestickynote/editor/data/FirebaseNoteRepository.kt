@@ -1,35 +1,41 @@
 package com.yanbin.reactivestickynote.editor.data
 
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.*
-import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.account.Account
 import com.yanbin.reactivestickynote.editor.model.Position
 import com.yanbin.reactivestickynote.editor.model.SelectedNote
+import com.yanbin.reactivestickynote.editor.model.StickyNote
 import com.yanbin.reactivestickynote.editor.model.YBColor
 import com.yanbin.utils.toIO
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class FirebaseNoteRepository : NoteRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val allNoteIdsSubject = BehaviorSubject.create<List<String>>()
+    private val allSelectedNotesSubject = BehaviorSubject.create<Map<String, SelectedNote>>()
     private val updatingNoteSubject = BehaviorSubject.createDefault(Optional.empty<StickyNote>())
 
     private val registrations = hashMapOf<String, ListenerRegistration>()
     private val noteSubjects = hashMapOf<String, Subject<StickyNote>>()
 
-    private val query = firestore.collection(COLLECTION_NOTES)
+    private val noteQuery = firestore.collection(COLLECTION_NOTES)
+        .limit(100)
+
+    private val selectNoteQuery = firestore.collection(COLLECTION_SELECTED_NOTES)
         .limit(100)
 
     init {
-        query.addSnapshotListener { result, e ->
-            result?.let { onSnapshotUpdated(it) }
+        noteQuery.addSnapshotListener { result, e ->
+            result?.let { onNoteUpdated(it) }
+        }
+
+        selectNoteQuery.addSnapshotListener { result, e ->
+            result?.let { onSelectedNoteUpdated(it) }
         }
 
         updatingNoteSubject
@@ -98,28 +104,35 @@ class FirebaseNoteRepository : NoteRepository {
             .delete()
     }
 
-    private val selectedNotes = BehaviorSubject.createDefault(emptyList<SelectedNote>())
-    private val selectedNoteMap = ConcurrentHashMap<String, SelectedNote>()
-
     override fun getAllSelectedNotes(): Observable<List<SelectedNote>> {
-        return selectedNotes.hide()
+        return allSelectedNotesSubject.hide()
+            .map { it.values.toMutableList() }
     }
 
-    override fun addNoteSelection(noteId: String, userName: String) {
-        selectedNoteMap[noteId] = SelectedNote(noteId, userName)
-        selectedNotes.onNext(selectedNoteMap.elements().toList())
+    override fun setNoteSelection(noteId: String, account: Account) {
+        val selectedNoteData = hashMapOf(
+            FIELD_NOTE_ID to noteId,
+            FIELD_USER_NAME to account.userName
+        )
+
+        firestore.collection(COLLECTION_SELECTED_NOTES)
+            .document(account.id)
+            .set(selectedNoteData)
     }
 
-    override fun removeNoteSelection(noteId: String) {
-        selectedNoteMap.remove(noteId)
-        selectedNotes.onNext(selectedNoteMap.elements().toList())
+    override fun removeNoteSelection(noteId: String, account: Account) {
+        runCatching {
+            firestore.collection(COLLECTION_SELECTED_NOTES)
+                .document(account.id)
+                .delete()
+        }
     }
 
     private fun createDocumentRef(id: String): DocumentReference {
         return firestore.collection(COLLECTION_NOTES).document(id)
     }
 
-    private fun onSnapshotUpdated(snapshot: QuerySnapshot) {
+    private fun onNoteUpdated(snapshot: QuerySnapshot) {
         if (snapshot.documentChanges.any { it.type == DocumentChange.Type.ADDED || it.type == DocumentChange.Type.REMOVED }) {
             val allNoteIds = snapshot.map { it.id }
             allNoteIdsSubject.onNext(allNoteIds)
@@ -132,6 +145,22 @@ class FirebaseNoteRepository : NoteRepository {
                 registrations[id]?.remove()
                 noteSubjects[id]?.onComplete()
             }
+    }
+
+    private fun onSelectedNoteUpdated(snapshot: QuerySnapshot) {
+        val allSelectedNotes = snapshot.documents
+            .mapNotNull { document ->
+                val id = document.id
+                val data: Map<String, Any> = document.data as? Map<String, Any> ?: return@mapNotNull null
+
+                val userName = data[FIELD_USER_NAME] as? String ?: return@mapNotNull null
+                val noteId = data[FIELD_NOTE_ID] as? String ?: return@mapNotNull null
+
+                id to SelectedNote(noteId, userName)
+            }
+            .toMap()
+
+        allSelectedNotesSubject.onNext(allSelectedNotes)
     }
 
     private fun setNoteDocument(stickyNote: StickyNote) {
@@ -149,19 +178,22 @@ class FirebaseNoteRepository : NoteRepository {
 
     private fun documentToNotes(document: DocumentSnapshot?): StickyNote? {
         val data: Map<String, Any> = document?.data as? Map<String, Any> ?: return null
-        val text = data[FIELD_TEXT] as String
-        val color = YBColor(data[FIELD_COLOR] as Long)
-        val positionX = data[FIELD_POSITION_X] as Double? ?: 0f
-        val positionY = data[FIELD_POSITION_Y] as Double? ?: 0f
+        val text = data[FIELD_TEXT] as? String ?: ""
+        val color = YBColor(data[FIELD_COLOR] as? Long ?: 0L)
+        val positionX = data[FIELD_POSITION_X] as? Double ?: 0f
+        val positionY = data[FIELD_POSITION_Y] as? Double ?: 0f
         val position = Position(positionX.toFloat(), positionY.toFloat())
         return StickyNote(document.id, text, position, color)
     }
 
     companion object {
         const val COLLECTION_NOTES = "Notes"
+        const val COLLECTION_SELECTED_NOTES = "SelectedNotes"
         const val FIELD_TEXT = "text"
         const val FIELD_COLOR = "color"
         const val FIELD_POSITION_X = "positionX"
         const val FIELD_POSITION_Y = "positionY"
+        const val FIELD_USER_NAME = "userName"
+        const val FIELD_NOTE_ID = "noteId"
     }
 }

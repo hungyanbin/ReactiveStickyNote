@@ -1,5 +1,6 @@
 package com.yanbin.reactivestickynote.editor.data
 
+import com.yanbin.reactivestickynote.account.Account
 import com.yanbin.reactivestickynote.editor.model.SelectedNote
 import com.yanbin.reactivestickynote.editor.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
@@ -41,12 +42,12 @@ class InMemoryNoteRepository: NoteRepository {
         return selectedNotes.hide()
     }
 
-    override fun addNoteSelection(noteId: String, userName: String) {
-        selectedNoteMap[noteId] = SelectedNote(noteId, userName)
+    override fun setNoteSelection(noteId: String, account: Account) {
+        selectedNoteMap[noteId] = SelectedNote(noteId, account.userName)
         selectedNotes.onNext(selectedNoteMap.elements().toList())
     }
 
-    override fun removeNoteSelection(noteId: String) {
+    override fun removeNoteSelection(noteId: String, account: Account) {
         selectedNoteMap.remove(noteId)
         selectedNotes.onNext(selectedNoteMap.elements().toList())
     }

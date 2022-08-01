@@ -28,9 +28,9 @@ class StickyNoteEditor(
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
     val showAddButton: Observable<Boolean> = _showAddButton.hide()
 
-    val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
+    private val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
         Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
-    }
+    }.startWithItem(Optional.empty<SelectedNote>())
 
     // State
     val selectedNote: Observable<Optional<StickyNote>> = userSelectedNote
@@ -69,37 +69,41 @@ class StickyNoteEditor(
 
     fun selectNote(noteId: String) {
         Observable.just(noteId)
-            .withLatestFrom(userSelectedNote) { id, selectedNote ->
-                id to selectedNote
+            .withLatestFrom(selectedNotes) { id, selectedNotes ->
+                id to selectedNotes
             }
             .firstElement()
-            .subscribe { (id, selectedNote) ->
-                selectedNote.fold(
-                    someFun = { note ->
-                        if (note.noteId == id) {
-                            setNoteUnSelected(id)
-                            showAddButton()
-                        } else {
-                            setNoteUnSelected(note.noteId)
-                            setNoteSelected(id)
-                            showContextMenu()
-                        }
-                    },
-                    emptyFun = {
-                        setNoteSelected(id)
-                        showContextMenu()
+            .subscribe { (id, selectedNotes) ->
+                if (isNoteSelecting(id, selectedNotes)) {
+                    if (isSelectedByUser(id, selectedNotes)) {
+                        setNoteUnSelected(id)
+                        showAddButton()
+                    } else {
+                        // can not select other user's note
                     }
-                )
+                } else {
+                    setNoteSelected(id)
+                    showContextMenu()
+                }
             }
             .addTo(disposableBag)
     }
 
+    private fun isSelectedByUser(id: String, selectedNotes: List<SelectedNote>): Boolean {
+        return selectedNotes.find { selectedNote -> selectedNote.userName == accountService.getCurrentAccount().userName }
+            ?.let { selectedNote -> selectedNote.noteId == id } ?: false
+    }
+
+    private fun isNoteSelecting(id: String, selectedNotes: List<SelectedNote>): Boolean {
+        return selectedNotes.any { it.noteId == id }
+    }
+
     private fun setNoteSelected(id: String) {
-        noteRepository.addNoteSelection(id, accountService.getCurrentAccount().userName)
+        noteRepository.setNoteSelection(id, accountService.getCurrentAccount())
     }
 
     private fun setNoteUnSelected(id: String) {
-        noteRepository.removeNoteSelection(id)
+        noteRepository.removeNoteSelection(id, accountService.getCurrentAccount())
     }
 
     private fun showAddButton() {
@@ -113,7 +117,9 @@ class StickyNoteEditor(
     }
 
     fun clearSelection() {
-        userSelectedNote
+        selectedNotes.map { notes ->
+            Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
+        }
             .take(1)
             .mapOptional { it }
             .subscribe { selectedNote ->

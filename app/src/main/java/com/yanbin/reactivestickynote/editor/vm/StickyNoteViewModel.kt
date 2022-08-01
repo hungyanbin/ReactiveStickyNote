@@ -18,10 +18,11 @@ class StickyNoteViewModel(
         stickyNoteEditor.selectNote(id)
     }
 
-    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(stickyNoteEditor.getNoteById(id), stickyNoteEditor.userSelectedNote)
-        .map { (note, userSelectedNote) ->
-            if (userSelectedNote.isPresent && note.id == userSelectedNote.get().noteId) {
-                StickyNoteUiModel(note, StickyNoteUiModel.State.Selected(userSelectedNote.get().userName))
+    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(stickyNoteEditor.getNoteById(id), stickyNoteEditor.selectedNotes)
+        .map { (note, selectedNotes) ->
+            val selectedNote = selectedNotes.find { it.noteId == note.id }
+            if (selectedNote != null) {
+                StickyNoteUiModel(note, StickyNoteUiModel.State.Selected(selectedNote.userName))
             } else {
                 StickyNoteUiModel(note, StickyNoteUiModel.State.Normal)
             }
