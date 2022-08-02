@@ -79,7 +79,7 @@ fun StickyNoteView(
             .clickable { onClick(stickyNoteUiModel.id) }
             .pointerInput(stickyNoteUiModel.id) {
                 detectDragGestures { change, dragAmount ->
-                    change.consumeAllChanges()
+                    change.consume()
                     onPositionChanged(Position(dragAmount.x, dragAmount.y))
                 }
             }

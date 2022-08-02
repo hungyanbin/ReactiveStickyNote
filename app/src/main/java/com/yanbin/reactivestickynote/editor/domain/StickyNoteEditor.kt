@@ -48,6 +48,7 @@ class StickyNoteEditor(
 
     // Component
     val contextMenu = ContextMenu(selectedNote)
+    val viewPort = ViewPort()
 
     private val disposableBag = CompositeDisposable()
 

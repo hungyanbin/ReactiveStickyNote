@@ -19,6 +19,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
+import com.yanbin.reactivestickynote.editor.model.Position
 import com.yanbin.reactivestickynote.editor.model.StickyNote
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
 import com.yanbin.utils.subscribeBy
@@ -45,8 +46,10 @@ fun StickyNoteEditorScreen(
             val showContextMenu by viewModel.showContextMenu.subscribeAsState(initial = false)
             val showAddButton by viewModel.showAddButton.subscribeAsState(initial = true)
             val noteIds by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
+            val viewPortScale by viewModel.viewPortScale.subscribeAsState(initial = 1f)
+            val viewPortCenter by viewModel.viewPortCenter.subscribeAsState(initial = Position(0f, 0f))
 
-            ViewPortView(noteIds)
+            ViewPortView(noteIds, viewPortScale, viewPortCenter, viewModel::transformViewPort)
 
             AnimatedVisibility(
                 visible = showAddButton,
