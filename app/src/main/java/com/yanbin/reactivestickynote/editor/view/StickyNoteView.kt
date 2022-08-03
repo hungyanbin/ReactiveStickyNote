@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -133,7 +134,9 @@ fun StickyNoteView(
                             change.consume()
                             onSizeChanged(dragAmount.x, dragAmount.y)
                         }
-                    },
+                    }
+                    .rotate(90f)
+                ,
                 painter = painterResource(id = R.drawable.ic_scale),
                 contentDescription = "")
         }

@@ -196,11 +196,14 @@ class StickyNoteEditor(
     }
 
     private fun deleteNote() {
-        userSelectedNote.take(1)
-            .mapOptional { it }
-            .subscribe { selectedNote ->
-                noteRepository.deleteNote(selectedNote.noteId)
-                clearSelection()
+        Observable.just(Unit)
+            .withLatestFrom(userSelectedNote) { _, optSelectedNote ->
+                optSelectedNote.map { note ->
+                    note.noteId
+                }
+            }.mapOptional { it }
+            .subscribe { id ->
+                noteRepository.deleteNote(id)
             }
             .addTo(disposableBag)
     }
