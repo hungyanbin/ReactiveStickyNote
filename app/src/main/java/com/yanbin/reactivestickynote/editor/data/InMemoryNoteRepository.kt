@@ -1,9 +1,11 @@
 package com.yanbin.reactivestickynote.editor.data
 
 import com.yanbin.reactivestickynote.account.Account
+import com.yanbin.reactivestickynote.editor.model.Position
 import com.yanbin.reactivestickynote.editor.model.SelectedNote
 import com.yanbin.reactivestickynote.editor.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -43,12 +45,12 @@ class InMemoryNoteRepository: NoteRepository {
     }
 
     override fun setNoteSelection(noteId: String, account: Account) {
-        selectedNoteMap[noteId] = SelectedNote(noteId, account.userName)
+        selectedNoteMap[account.id] = SelectedNote(noteId, account.userName)
         selectedNotes.onNext(selectedNoteMap.elements().toList())
     }
 
     override fun removeNoteSelection(noteId: String, account: Account) {
-        selectedNoteMap.remove(noteId)
+        selectedNoteMap.remove(account.id)
         selectedNotes.onNext(selectedNoteMap.elements().toList())
     }
 

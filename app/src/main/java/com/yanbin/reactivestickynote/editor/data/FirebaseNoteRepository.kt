@@ -2,10 +2,7 @@ package com.yanbin.reactivestickynote.editor.data
 
 import com.google.firebase.firestore.*
 import com.yanbin.reactivestickynote.account.Account
-import com.yanbin.reactivestickynote.editor.model.Position
-import com.yanbin.reactivestickynote.editor.model.SelectedNote
-import com.yanbin.reactivestickynote.editor.model.StickyNote
-import com.yanbin.reactivestickynote.editor.model.YBColor
+import com.yanbin.reactivestickynote.editor.model.*
 import com.yanbin.utils.toIO
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -168,7 +165,9 @@ class FirebaseNoteRepository : NoteRepository {
             FIELD_TEXT to stickyNote.text,
             FIELD_COLOR to stickyNote.color.color,
             FIELD_POSITION_X to stickyNote.position.x,
-            FIELD_POSITION_Y to stickyNote.position.y
+            FIELD_POSITION_Y to stickyNote.position.y,
+            FIELD_SIZE_WIDTH to stickyNote.size.width,
+            FIELD_SIZE_HEIGHT to stickyNote.size.height,
         )
 
         firestore.collection(COLLECTION_NOTES)
@@ -182,8 +181,11 @@ class FirebaseNoteRepository : NoteRepository {
         val color = YBColor(data[FIELD_COLOR] as? Long ?: 0L)
         val positionX = data[FIELD_POSITION_X] as? Double ?: 0f
         val positionY = data[FIELD_POSITION_Y] as? Double ?: 0f
+        val width = data[FIELD_SIZE_WIDTH] as? Double ?: StickyNote.DEFAULT_SIZE
+        val height = data[FIELD_SIZE_HEIGHT] as? Double ?: StickyNote.DEFAULT_SIZE
         val position = Position(positionX.toFloat(), positionY.toFloat())
-        return StickyNote(document.id, text, position, color)
+        val size = YBSize(width.toFloat(), height.toFloat())
+        return StickyNote(document.id, text, position, size, color)
     }
 
     companion object {
@@ -193,6 +195,8 @@ class FirebaseNoteRepository : NoteRepository {
         const val FIELD_COLOR = "color"
         const val FIELD_POSITION_X = "positionX"
         const val FIELD_POSITION_Y = "positionY"
+        const val FIELD_SIZE_WIDTH = "sizeWidth"
+        const val FIELD_SIZE_HEIGHT = "sizeHeight"
         const val FIELD_USER_NAME = "userName"
         const val FIELD_NOTE_ID = "noteId"
     }

@@ -1,10 +1,13 @@
 package com.yanbin.reactivestickynote.editor.view
 
+import android.util.Log
 import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -15,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import com.yanbin.reactivestickynote.R
 import com.yanbin.reactivestickynote.editor.model.Position
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteUiModel
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteViewModel
@@ -67,10 +72,11 @@ fun StickyNoteView(
 
     val selected = stickyNoteUiModel.isSelected
     val selectingUserName = stickyNoteUiModel.selectedUserName
+    val noteSize = stickyNoteUiModel.stickyNote.size
 
     Surface(
         modifier.offset { offset }
-            .size(108.dp, 108.dp)
+            .size(noteSize.width.dp, noteSize.height.dp)
             .highlightBorder(selected),
         color = Color(stickyNoteUiModel.color.color),
         elevation = 8.dp
@@ -94,5 +100,18 @@ fun StickyNoteView(
             text = selectingUserName,
             modifier = modifier.offset { offset.copy(y = offset.y + 108.dp.roundToPx()) }
         )
+
+        Icon(
+            modifier = modifier.offset { offset.copy(x = offset.x + 95.dp.roundToPx(), y = offset.y - 10.dp.roundToPx()) }
+                .background(Color.White)
+                .border(0.dp, Color.Black)
+                .pointerInput(stickyNoteUiModel.id) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        Log.i("testt", "drag scale ${dragAmount.x}, ${dragAmount.y}")
+                    }
+                },
+            painter = painterResource(id = R.drawable.ic_scale),
+            contentDescription = "")
     }
 }
