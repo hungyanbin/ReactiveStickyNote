@@ -52,9 +52,9 @@ fun StatefulStickyNoteView(
     )
 }
 
-private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show ->
+private val highlightBorder: @Composable Modifier.(Boolean, Color) -> Modifier = { show, color ->
     if (show) {
-        this.border(2.dp, Color.Black, MaterialTheme.shapes.medium)
+        this.border(2.dp, color, MaterialTheme.shapes.medium)
     } else {
         this
     }.padding(8.dp)
@@ -87,11 +87,12 @@ fun StickyNoteView(
 
     val selected = stickyNoteUiModel.isSelected
     val selectingUserName = stickyNoteUiModel.selectedUserName
+    val selectedColor = if (stickyNoteUiModel.isLocked) Color.Red else Color.Black
 
     Surface(
         modifier.offset { positionOffset }
             .size(noteWidthDp, noteHeightDp)
-            .highlightBorder(selected),
+            .highlightBorder(selected, selectedColor),
         color = Color(stickyNoteUiModel.color.color),
         elevation = 8.dp
     ) {
@@ -112,26 +113,29 @@ fun StickyNoteView(
     if (selectingUserName.isNotEmpty()) {
         Text(
             text = selectingUserName,
+            color = selectedColor,
             modifier = modifier.offset { positionOffset.copy(y = positionOffset.y + noteHeight.toInt() + 8.dp.roundToPx()) }
         )
 
-        Icon(
-            modifier = modifier
-                .offset {
-                    positionOffset.copy(
-                        x = positionOffset.x + noteWidth.toInt() - 14.dp.roundToPx(),
-                        y = positionOffset.y + noteHeight.toInt() - 14.dp.roundToPx()
-                    )
-                }
-                .background(Color.White)
-                .border(0.dp, Color.Black)
-                .pointerInput(stickyNoteUiModel.id) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        onSizeChanged(dragAmount.x, dragAmount.y)
+        if (!stickyNoteUiModel.isLocked) {
+            Icon(
+                modifier = modifier
+                    .offset {
+                        positionOffset.copy(
+                            x = positionOffset.x + noteWidth.toInt() - 14.dp.roundToPx(),
+                            y = positionOffset.y + noteHeight.toInt() - 14.dp.roundToPx()
+                        )
                     }
-                },
-            painter = painterResource(id = R.drawable.ic_scale),
-            contentDescription = "")
+                    .background(Color.White)
+                    .border(0.dp, Color.Black)
+                    .pointerInput(stickyNoteUiModel.id) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            onSizeChanged(dragAmount.x, dragAmount.y)
+                        }
+                    },
+                painter = painterResource(id = R.drawable.ic_scale),
+                contentDescription = "")
+        }
     }
 }

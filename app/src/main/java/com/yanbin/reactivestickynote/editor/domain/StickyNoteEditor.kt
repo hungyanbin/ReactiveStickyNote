@@ -25,7 +25,7 @@ class StickyNoteEditor(
     val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
     val showAddButton: Observable<Boolean> = _showAddButton.hide()
 
-    private val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
+    val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
         Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
     }.startWithItem(Optional.empty<SelectedNote>())
 

@@ -3,6 +3,7 @@ package com.yanbin.reactivestickynote.editor.vm
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
 
@@ -22,13 +23,15 @@ class StickyNoteViewModel(
         stickyNoteEditor.selectNote(id)
     }
 
-    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(stickyNoteEditor.getNoteById(id), stickyNoteEditor.selectedNotes)
-        .map { (note, selectedNotes) ->
+    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(stickyNoteEditor.getNoteById(id), stickyNoteEditor.selectedNotes, stickyNoteEditor.userSelectedNote)
+        .map { (note, selectedNotes, userSelectedNote) ->
             val selectedNote = selectedNotes.find { it.noteId == note.id }
             if (selectedNote != null) {
-                StickyNoteUiModel(note, StickyNoteUiModel.State.Selected(selectedNote.userName))
+                val isCurrentUser = userSelectedNote.fold(someFun = {it.noteId == note.id}, emptyFun = {false})
+                StickyNoteUiModel(note, StickyNoteUiModel.State.Selected(selectedNote.userName, isLocked = !isCurrentUser))
             } else {
                 StickyNoteUiModel(note, StickyNoteUiModel.State.Normal)
             }
         }
+        .distinctUntilChanged()
 }

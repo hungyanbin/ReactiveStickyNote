@@ -12,6 +12,7 @@ data class StickyNoteUiModel(
     val color = stickyNote.color
     val text = stickyNote.text
     val isSelected = state is State.Selected
+    val isLocked = state is State.Selected && state.isLocked
     val selectedUserName = if (state is State.Selected) {
         state.displayName
     } else {
@@ -19,7 +20,7 @@ data class StickyNoteUiModel(
     }
 
     sealed class State {
-        class Selected(val displayName: String): State()
+        class Selected(val displayName: String, val isLocked: Boolean): State()
         object Normal: State()
     }
 
