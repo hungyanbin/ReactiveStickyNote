@@ -23,6 +23,7 @@ data class StickyNote(
             return StickyNote(id, "", Position(0f, Float.MAX_VALUE), YBSize(0f, 0f), YBColor.HotPink)
         }
 
-        const val DEFAULT_SIZE = 108f
+        const val DEFAULT_SIZE = 330f
+        const val MIN_SIZE = 250f
     }
 }

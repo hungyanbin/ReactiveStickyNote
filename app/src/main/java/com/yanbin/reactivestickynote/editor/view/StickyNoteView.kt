@@ -1,6 +1,6 @@
 package com.yanbin.reactivestickynote.editor.view
 
-import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,8 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -37,12 +37,17 @@ fun StatefulStickyNoteView(
     val onPositionChanged: (Position) -> Unit = { delta ->
         stickyNoteViewModel.moveNote(id, delta)
     }
+    val onSizeChanged: (Float, Float) -> Unit = { deltaX, deltaY ->
+        stickyNoteViewModel.onChangeSize(id, deltaX, deltaY)
+    }
+
     val noteUiModel by stickyNoteViewModel.getNoteById(id).subscribeAsState(initial = StickyNoteUiModel.emptyUiModel(id))
 
     StickyNoteView(
         modifier = modifier,
         onPositionChanged = onPositionChanged,
         onClick = stickyNoteViewModel::tapNote,
+        onSizeChanged = onSizeChanged,
         stickyNoteUiModel = noteUiModel
     )
 }
@@ -60,23 +65,32 @@ private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show
 fun StickyNoteView(
     modifier: Modifier = Modifier,
     onPositionChanged: (Position) -> Unit = {},
+    onSizeChanged: (Float, Float) -> Unit = { _, _ -> },
     onClick: (String) -> Unit,
     stickyNoteUiModel: StickyNoteUiModel,
 ) {
-    val offset by animateIntOffsetAsState(
+    val noteSize = stickyNoteUiModel.stickyNote.size
+    val noteWidth = noteSize.width
+    val noteHeight = noteSize.height
+    val density = LocalDensity.current
+
+    val noteWidthDp by animateDpAsState(targetValue = with(density) { noteWidth.toDp() })
+    val noteHeightDp by animateDpAsState(targetValue = with(density) { noteHeight.toDp() })
+
+    val positionOffset by animateIntOffsetAsState(
         targetValue = IntOffset(
             stickyNoteUiModel.position.x.toInt(),
             stickyNoteUiModel.position.y.toInt()
         )
     )
 
+
     val selected = stickyNoteUiModel.isSelected
     val selectingUserName = stickyNoteUiModel.selectedUserName
-    val noteSize = stickyNoteUiModel.stickyNote.size
 
     Surface(
-        modifier.offset { offset }
-            .size(noteSize.width.dp, noteSize.height.dp)
+        modifier.offset { positionOffset }
+            .size(noteWidthDp, noteHeightDp)
             .highlightBorder(selected),
         color = Color(stickyNoteUiModel.color.color),
         elevation = 8.dp
@@ -98,17 +112,23 @@ fun StickyNoteView(
     if (selectingUserName.isNotEmpty()) {
         Text(
             text = selectingUserName,
-            modifier = modifier.offset { offset.copy(y = offset.y + 108.dp.roundToPx()) }
+            modifier = modifier.offset { positionOffset.copy(y = positionOffset.y + noteHeight.toInt() + 8.dp.roundToPx()) }
         )
 
         Icon(
-            modifier = modifier.offset { offset.copy(x = offset.x + 95.dp.roundToPx(), y = offset.y - 10.dp.roundToPx()) }
+            modifier = modifier
+                .offset {
+                    positionOffset.copy(
+                        x = positionOffset.x + noteWidth.toInt() - 14.dp.roundToPx(),
+                        y = positionOffset.y + noteHeight.toInt() - 14.dp.roundToPx()
+                    )
+                }
                 .background(Color.White)
                 .border(0.dp, Color.Black)
                 .pointerInput(stickyNoteUiModel.id) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        Log.i("testt", "drag scale ${dragAmount.x}, ${dragAmount.y}")
+                        onSizeChanged(dragAmount.x, dragAmount.y)
                     }
                 },
             painter = painterResource(id = R.drawable.ic_scale),

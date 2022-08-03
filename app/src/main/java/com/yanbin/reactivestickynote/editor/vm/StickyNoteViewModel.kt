@@ -14,6 +14,10 @@ class StickyNoteViewModel(
         stickyNoteEditor.moveNote(noteId, positionDelta)
     }
 
+    fun onChangeSize(noteId: String, xDelta: Float, yDelta: Float) {
+        stickyNoteEditor.changeNoteSize(noteId, xDelta, yDelta)
+    }
+
     fun tapNote(id: String) {
         stickyNoteEditor.selectNote(id)
     }
