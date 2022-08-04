@@ -5,7 +5,7 @@ import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.Position
 import com.yanbin.reactivestickynote.editor.model.StickyNote
-import com.yanbin.reactivestickynote.editor.usecase.BaseRxJavaUseCase
+import com.yanbin.reactivestickynote.editor.usecase.BaseEditorUseCase
 import com.yanbin.reactivestickynote.editor.usecase.ChangeColorUseCase
 import com.yanbin.reactivestickynote.editor.usecase.DeleteNoteUseCase
 import com.yanbin.reactivestickynote.editor.usecase.EditTextUseCase
@@ -24,7 +24,7 @@ class EditorViewModel(
     val viewPortScale = stickyNoteEditor.viewPort.scale
     val viewPortCenter = stickyNoteEditor.viewPort.center
 
-    private val useCases: MutableList<BaseRxJavaUseCase> = mutableListOf()
+    val useCases: MutableList<BaseEditorUseCase> = mutableListOf()
 
     init {
         DeleteNoteUseCase(noteRepository).apply {

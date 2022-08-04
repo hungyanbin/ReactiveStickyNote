@@ -3,7 +3,6 @@ package com.yanbin.reactivestickynote.editor.domain
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.model.*
-import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -126,61 +125,6 @@ class StickyNoteEditor(
     fun addNewNote() {
         val newNote = StickyNote.createRandomNote()
         noteRepository.createNote(newNote)
-    }
-
-    fun moveNote(noteId: String, positionDelta: Position) {
-        Observable.just(positionDelta)
-            .withLatestFrom(userSelectedNote, noteRepository.getNoteById(noteId)) { delta, optSelectedNote, note ->
-                optSelectedNote.fold(
-                    someFun = {
-                        // Can move
-                        if (it.noteId == noteId) {
-                            note.copy(position = note.position + delta)
-                        } else {
-                            null
-                        }
-                    },
-                    emptyFun = {
-                        null
-                    }
-                ).let { Optional.ofNullable(it) }
-            }
-            .mapOptional { it }
-            .subscribe { note ->
-                noteRepository.putNote(note)
-            }
-            .addTo(disposableBag)
-    }
-
-    fun changeNoteSize(noteId: String, widthDelta: Float, heightDelta: Float) {
-        Observable.just(widthDelta to heightDelta)
-            .withLatestFrom(userSelectedNote, noteRepository.getNoteById(noteId)) { (widthDelta, heightDelta), optSelectedNote, note ->
-                optSelectedNote.fold(
-                    someFun = {
-                        // Can move
-                        if (it.noteId == noteId) {
-                            changeNoteSizeWithConstraint(note, widthDelta, heightDelta)
-                        } else {
-                            null
-                        }
-                    },
-                    emptyFun = {
-                        null
-                    }
-                ).let { Optional.ofNullable(it) }
-            }
-            .mapOptional { it }
-            .subscribe { note ->
-                noteRepository.putNote(note)
-            }
-            .addTo(disposableBag)
-    }
-
-    private fun changeNoteSizeWithConstraint(note: StickyNote, widthDelta: Float, heightDelta: Float): StickyNote {
-        val currentSize = note.size
-        val newWidth = (currentSize.width + widthDelta).coerceAtLeast(StickyNote.MIN_SIZE)
-        val newHeight = (currentSize.height + heightDelta).coerceAtLeast(StickyNote.MIN_SIZE)
-        return note.copy(size = YBSize(newWidth, newHeight))
     }
 
     fun navigateToEditTextPage() {

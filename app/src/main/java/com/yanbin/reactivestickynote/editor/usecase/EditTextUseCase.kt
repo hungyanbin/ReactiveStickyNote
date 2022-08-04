@@ -5,9 +5,9 @@ import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.utils.filterInstance
 import io.reactivex.rxjava3.kotlin.addTo
 
-class EditTextUseCase(): BaseRxJavaUseCase() {
+class EditTextUseCase : BaseEditorUseCase() {
 
-    fun start(stickyNoteEditor: StickyNoteEditor) {
+    override fun start(stickyNoteEditor: StickyNoteEditor) {
         stickyNoteEditor.contextMenu
             .contextMenuEvents
             .filterInstance<ContextMenuEvent.NavigateToEditTextPage>()
