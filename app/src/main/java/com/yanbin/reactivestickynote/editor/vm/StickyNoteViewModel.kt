@@ -1,6 +1,7 @@
 package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
+import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.Position
@@ -12,11 +13,13 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class StickyNoteViewModel(
     private val stickyNoteEditor: StickyNoteEditor,
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val accountService: AccountService
 ): ViewModel() {
 
     private val moveNoteSubject = PublishSubject.create<NotePositionDelta>()
     private val resizeNoteSubject = PublishSubject.create<NoteSizeDelta>()
+    private val tapNoteSubject = PublishSubject.create<String>()
     private val useCases = mutableListOf<BaseEditorUseCase>()
 
     init {
@@ -25,6 +28,10 @@ class StickyNoteViewModel(
             useCases.add(this)
         }
         ResizeNoteUseCase(noteRepository, resizeNoteSubject.hide()).apply {
+            start(stickyNoteEditor)
+            useCases.add(this)
+        }
+        TapNoteUseCae(accountService, tapNoteSubject.hide()).apply {
             start(stickyNoteEditor)
             useCases.add(this)
         }
@@ -39,14 +46,14 @@ class StickyNoteViewModel(
     }
 
     fun tapNote(id: String) {
-        stickyNoteEditor.selectNote(id)
+        tapNoteSubject.onNext(id)
     }
 
     fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(stickyNoteEditor.getNoteById(id), stickyNoteEditor.selectedNotes, stickyNoteEditor.userSelectedNote)
         .map { (note, selectedNotes, userSelectedNote) ->
             val selectedNote = selectedNotes.find { it.noteId == note.id }
             if (selectedNote != null) {
-                val isCurrentUser = userSelectedNote.fold(someFun = {it.noteId == note.id}, emptyFun = {false})
+                val isCurrentUser = userSelectedNote.fold(someFun = { it.noteId == note.id }, emptyFun = { false })
                 StickyNoteUiModel(note, StickyNoteUiModel.State.Selected(selectedNote.userName, isLocked = !isCurrentUser))
             } else {
                 StickyNoteUiModel(note, StickyNoteUiModel.State.Normal)

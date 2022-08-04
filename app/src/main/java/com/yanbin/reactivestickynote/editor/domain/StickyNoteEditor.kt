@@ -5,7 +5,6 @@ import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.model.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
@@ -17,7 +16,7 @@ class StickyNoteEditor(
 
     private val _showContextMenu = BehaviorSubject.createDefault(false)
     private val _showAddButton = BehaviorSubject.createDefault(true)
-    private val openEditTextScreenSignal = PublishSubject.create<Unit>()
+    private val openEditTextScreenSignal = PublishSubject.create<StickyNote>()
 
     val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes()
     val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
@@ -38,9 +37,7 @@ class StickyNoteEditor(
                 Observable.just(Optional.empty())
             }
         }
-    val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.withLatestFrom(selectedNote) { _, optNote ->
-        optNote
-    }.mapOptional { it }
+    val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.hide()
 
     // Component
     val contextMenu = ContextMenu(selectedNote)
@@ -54,37 +51,6 @@ class StickyNoteEditor(
 
     fun stop() {
         disposableBag.clear()
-    }
-
-    fun selectNote(noteId: String) {
-        Observable.just(noteId)
-            .withLatestFrom(selectedNotes) { id, selectedNotes ->
-                id to selectedNotes
-            }
-            .firstElement()
-            .subscribe { (id, selectedNotes) ->
-                if (isNoteSelecting(id, selectedNotes)) {
-                    if (isSelectedByUser(id, selectedNotes)) {
-                        setNoteUnSelected(id)
-                        showAddButton()
-                    } else {
-                        // can not select other user's note
-                    }
-                } else {
-                    setNoteSelected(id)
-                    showContextMenu()
-                }
-            }
-            .addTo(disposableBag)
-    }
-
-    private fun isSelectedByUser(id: String, selectedNotes: List<SelectedNote>): Boolean {
-        return selectedNotes.find { selectedNote -> selectedNote.userName == accountService.getCurrentAccount().userName }
-            ?.let { selectedNote -> selectedNote.noteId == id } ?: false
-    }
-
-    private fun isNoteSelecting(id: String, selectedNotes: List<SelectedNote>): Boolean {
-        return selectedNotes.any { it.noteId == id }
     }
 
     fun setNoteSelected(id: String) {
@@ -105,19 +71,6 @@ class StickyNoteEditor(
         _showContextMenu.onNext(true)
     }
 
-    fun clearSelection() {
-        selectedNotes.map { notes ->
-            Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
-        }
-            .take(1)
-            .mapOptional { it }
-            .subscribe { selectedNote ->
-                setNoteUnSelected(selectedNote.noteId)
-                showAddButton()
-            }
-            .addTo(disposableBag)
-    }
-
     fun getNoteById(id: String): Observable<StickyNote> {
         return noteRepository.getNoteById(id)
     }
@@ -127,8 +80,8 @@ class StickyNoteEditor(
         noteRepository.createNote(newNote)
     }
 
-    fun navigateToEditTextPage() {
-        openEditTextScreenSignal.onNext(Unit)
+    fun navigateToEditTextPage(stickyNote: StickyNote) {
+        openEditTextScreenSignal.onNext(stickyNote)
     }
 
 }

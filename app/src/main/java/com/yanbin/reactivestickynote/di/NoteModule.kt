@@ -58,7 +58,8 @@ fun getNoteModule() =
         viewModel {
             StickyNoteViewModel(
                 stickyNoteEditor = get(),
-                noteRepository = get()
+                noteRepository = get(),
+                accountService = get()
             )
         }
 

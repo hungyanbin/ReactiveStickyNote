@@ -5,16 +5,16 @@ import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.Position
 import com.yanbin.reactivestickynote.editor.model.StickyNote
-import com.yanbin.reactivestickynote.editor.usecase.BaseEditorUseCase
-import com.yanbin.reactivestickynote.editor.usecase.ChangeColorUseCase
-import com.yanbin.reactivestickynote.editor.usecase.DeleteNoteUseCase
-import com.yanbin.reactivestickynote.editor.usecase.EditTextUseCase
+import com.yanbin.reactivestickynote.editor.usecase.*
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 class EditorViewModel(
     private val stickyNoteEditor: StickyNoteEditor,
     private val noteRepository: NoteRepository
 ): ViewModel() {
+
+    private val tapCanvasSubject = PublishSubject.create<Unit>()
 
     val openEditTextScreen: Observable<StickyNote> = stickyNoteEditor.openEditTextScreen
     val allVisibleNoteIds = stickyNoteEditor.allVisibleNoteIds
@@ -24,7 +24,7 @@ class EditorViewModel(
     val viewPortScale = stickyNoteEditor.viewPort.scale
     val viewPortCenter = stickyNoteEditor.viewPort.center
 
-    val useCases: MutableList<BaseEditorUseCase> = mutableListOf()
+    private val useCases: MutableList<BaseEditorUseCase> = mutableListOf()
 
     init {
         DeleteNoteUseCase(noteRepository).apply {
@@ -39,6 +39,10 @@ class EditorViewModel(
             start(stickyNoteEditor)
             useCases.add(this)
         }
+        TapCanvasUseCae(tapCanvasSubject.hide()).apply {
+            start(stickyNoteEditor)
+            useCases.add(this)
+        }
         stickyNoteEditor.start()
     }
 
@@ -47,7 +51,7 @@ class EditorViewModel(
     }
 
     fun tapCanvas() {
-        stickyNoteEditor.clearSelection()
+        tapCanvasSubject.onNext(Unit)
     }
 
     fun transformViewPort(position: Position, scale: Float) {

@@ -11,8 +11,10 @@ class EditTextUseCase : BaseEditorUseCase() {
         stickyNoteEditor.contextMenu
             .contextMenuEvents
             .filterInstance<ContextMenuEvent.NavigateToEditTextPage>()
-            .subscribe {
-                stickyNoteEditor.navigateToEditTextPage()
+            .withLatestFrom(stickyNoteEditor.selectedNote) { _, selectedNote -> selectedNote}
+            .mapOptional { it }
+            .subscribe { stickyNote ->
+                stickyNoteEditor.navigateToEditTextPage(stickyNote)
             }
             .addTo(disposableBag)
     }
