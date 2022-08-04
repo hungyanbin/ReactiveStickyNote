@@ -50,15 +50,7 @@ class StickyNoteEditor(
     private val disposableBag = CompositeDisposable()
 
     fun start() {
-        contextMenu.contextMenuEvents
-            .subscribe { menuEvent ->
-                when(menuEvent) {
-                    ContextMenuEvent.NavigateToEditTextPage -> navigateToEditTextPage()
-                    is ContextMenuEvent.ChangeColor -> changeColor(menuEvent.color)
-                    ContextMenuEvent.DeleteNote -> deleteNote()
-                }
-            }
-            .addTo(disposableBag)
+        // TODO remove later
     }
 
     fun stop() {
@@ -96,20 +88,20 @@ class StickyNoteEditor(
         return selectedNotes.any { it.noteId == id }
     }
 
-    private fun setNoteSelected(id: String) {
+    fun setNoteSelected(id: String) {
         noteRepository.setNoteSelection(id, accountService.getCurrentAccount())
     }
 
-    private fun setNoteUnSelected(id: String) {
+    fun setNoteUnSelected(id: String) {
         noteRepository.removeNoteSelection(id, accountService.getCurrentAccount())
     }
 
-    private fun showAddButton() {
+    fun showAddButton() {
         _showAddButton.onNext(true)
         _showContextMenu.onNext(false)
     }
 
-    private fun showContextMenu() {
+    fun showContextMenu() {
         _showAddButton.onNext(false)
         _showContextMenu.onNext(true)
     }
@@ -191,34 +183,8 @@ class StickyNoteEditor(
         return note.copy(size = YBSize(newWidth, newHeight))
     }
 
-    private fun navigateToEditTextPage() {
+    fun navigateToEditTextPage() {
         openEditTextScreenSignal.onNext(Unit)
-    }
-
-    private fun deleteNote() {
-        Observable.just(Unit)
-            .withLatestFrom(userSelectedNote) { _, optSelectedNote ->
-                optSelectedNote.map { note ->
-                    note.noteId
-                }
-            }.mapOptional { it }
-            .subscribe { id ->
-                noteRepository.deleteNote(id)
-            }
-            .addTo(disposableBag)
-    }
-
-    private fun changeColor(color: YBColor) {
-        Observable.just(color)
-            .withLatestFrom(selectedNote) { color, optSelectedNote ->
-                optSelectedNote.map { note ->
-                    note.copy(color = color)
-                }
-            }.mapOptional { it }
-            .subscribe { newNote ->
-                noteRepository.putNote(newNote)
-            }
-            .addTo(disposableBag)
     }
 
 }

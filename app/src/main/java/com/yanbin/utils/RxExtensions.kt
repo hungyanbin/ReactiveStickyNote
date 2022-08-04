@@ -27,6 +27,11 @@ fun <T> Observable<T>.toMain(): Observable<T> {
     return this.observeOn(AndroidSchedulers.mainThread())
 }
 
+inline fun <reified T> Observable<in T>.filterInstance(): Observable<T> {
+    return filter { it is T }
+        .map { it as T }
+}
+
 fun <T> Maybe<T>.toIO(): Maybe<T> {
     return this.observeOn(Schedulers.io())
 }

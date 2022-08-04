@@ -31,7 +31,8 @@ fun getNoteModule() =
     module {
         viewModel {
             EditorViewModel(
-                stickyNoteEditor = get()
+                stickyNoteEditor = get(),
+                noteRepository = get()
             )
         }
 
