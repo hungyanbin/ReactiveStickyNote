@@ -4,7 +4,6 @@ import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.model.*
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
@@ -42,16 +41,6 @@ class StickyNoteEditor(
     // Component
     val contextMenu = ContextMenu(selectedNote)
     val viewPort = ViewPort()
-
-    private val disposableBag = CompositeDisposable()
-
-    fun start() {
-        // TODO remove later
-    }
-
-    fun stop() {
-        disposableBag.clear()
-    }
 
     fun setNoteSelected(id: String) {
         noteRepository.setNoteSelection(id, accountService.getCurrentAccount())

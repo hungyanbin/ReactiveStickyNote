@@ -43,7 +43,6 @@ class EditorViewModel(
             start(stickyNoteEditor)
             useCases.add(this)
         }
-        stickyNoteEditor.start()
     }
 
     fun addNewNote() {
@@ -60,7 +59,6 @@ class EditorViewModel(
 
     override fun onCleared() {
         useCases.forEach { it.stop() }
-        stickyNoteEditor.stop()
     }
 
 }
