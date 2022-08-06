@@ -1,7 +1,6 @@
 package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.Position
 import com.yanbin.reactivestickynote.editor.model.StickyNote
@@ -10,16 +9,15 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 class EditorViewModel(
-    private val stickyNoteEditor: StickyNoteEditor,
-    private val noteRepository: NoteRepository
+    private val stickyNoteEditor: StickyNoteEditor
 ): ViewModel() {
 
     private val tapCanvasSubject = PublishSubject.create<Unit>()
 
     val openEditTextScreen: Observable<StickyNote> = stickyNoteEditor.openEditTextScreen
     val allVisibleNoteIds = stickyNoteEditor.allVisibleNoteIds
-    val showContextMenu = stickyNoteEditor.showContextMenu
-    val showAddButton = stickyNoteEditor.showAddButton
+    val showContextMenu = stickyNoteEditor.isContextMenuShown
+    val showAddButton = stickyNoteEditor.isAddButtonShown
 
     val viewPortScale = stickyNoteEditor.viewPort.scale
     val viewPortCenter = stickyNoteEditor.viewPort.center
@@ -27,11 +25,11 @@ class EditorViewModel(
     private val useCases: MutableList<BaseEditorUseCase> = mutableListOf()
 
     init {
-        DeleteNoteUseCase(noteRepository).apply {
+        DeleteNoteUseCase().apply {
             start(stickyNoteEditor)
             useCases.add(this)
         }
-        ChangeColorUseCase(noteRepository).apply {
+        ChangeColorUseCase().apply {
             start(stickyNoteEditor)
             useCases.add(this)
         }

@@ -11,7 +11,7 @@ class EditTextUseCase : BaseEditorUseCase() {
         stickyNoteEditor.contextMenu
             .contextMenuEvents
             .filterInstance<ContextMenuEvent.NavigateToEditTextPage>()
-            .withLatestFrom(stickyNoteEditor.selectedNote) { _, selectedNote -> selectedNote}
+            .withLatestFrom(stickyNoteEditor.selectedStickyNote) { _, selectedNote -> selectedNote}
             .mapOptional { it }
             .subscribe { stickyNote ->
                 stickyNoteEditor.navigateToEditTextPage(stickyNote)

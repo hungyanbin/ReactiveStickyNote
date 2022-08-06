@@ -57,7 +57,7 @@ internal class EditorViewModelTest {
     fun `tapNote called expect select the tapped note`() {
         every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val selectingNoteObserver = stickyNoteEditor.selectedNote.test()
+        val selectingNoteObserver = stickyNoteEditor.selectedStickyNote.test()
         val tappedNote = fakeNotes()[0]
         stickyNoteEditor.selectNote("1")
 
@@ -69,7 +69,7 @@ internal class EditorViewModelTest {
     fun `clearSelection called expect clear the selected note`() {
         every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val selectingNoteObserver = stickyNoteEditor.selectedNote.test()
+        val selectingNoteObserver = stickyNoteEditor.selectedStickyNote.test()
         stickyNoteEditor.selectNote("1")
         stickyNoteEditor.clearSelection()
 

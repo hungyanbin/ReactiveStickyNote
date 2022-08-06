@@ -1,6 +1,5 @@
 package com.yanbin.reactivestickynote.editor.usecase
 
-import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.StickyNote
 import com.yanbin.reactivestickynote.editor.model.YBSize
@@ -11,13 +10,12 @@ import io.reactivex.rxjava3.kotlin.addTo
 typealias NoteSizeDelta = Triple<String, Float, Float>
 
 class ResizeNoteUseCase(
-    private val noteRepository: NoteRepository,
     private val noteResizeObservable: Observable<NoteSizeDelta>
 ): BaseEditorUseCase() {
 
     override fun start(stickyNoteEditor: StickyNoteEditor) {
         val noteObservable = noteResizeObservable
-            .switchMap { (noteId) -> noteRepository.getNoteById(noteId) }
+            .switchMap { (noteId) -> stickyNoteEditor.getNoteById(noteId) }
         val deltaObservable = noteResizeObservable.map { (_, widthDelta, heightDelta) -> widthDelta to heightDelta }
 
         deltaObservable.withLatestFrom(stickyNoteEditor.userSelectedNote, noteObservable) { (widthDelta, heightDelta), optSelectedNote, note ->
@@ -27,7 +25,7 @@ class ResizeNoteUseCase(
         }
             .mapOptional { it }
             .subscribe { note ->
-                noteRepository.putNote(note)
+                stickyNoteEditor.updateNote(note)
             }
             .addTo(disposableBag)
     }

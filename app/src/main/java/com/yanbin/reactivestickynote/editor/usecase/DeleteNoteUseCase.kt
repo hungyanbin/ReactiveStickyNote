@@ -1,14 +1,11 @@
 package com.yanbin.reactivestickynote.editor.usecase
 
-import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.domain.ContextMenuEvent
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.utils.filterInstance
 import io.reactivex.rxjava3.kotlin.addTo
 
-class DeleteNoteUseCase(
-    private val noteRepository: NoteRepository,
-): BaseEditorUseCase() {
+class DeleteNoteUseCase : BaseEditorUseCase() {
 
     override fun start(stickyNoteEditor: StickyNoteEditor) {
         stickyNoteEditor.contextMenu
@@ -21,7 +18,7 @@ class DeleteNoteUseCase(
             }.mapOptional { it }
             .subscribe { id ->
                 stickyNoteEditor.setNoteUnSelected(id)
-                noteRepository.deleteNote(id)
+                stickyNoteEditor.removeNote(id)
                 stickyNoteEditor.showAddButton()
             }
             .addTo(disposableBag)

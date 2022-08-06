@@ -19,18 +19,18 @@ class StickyNoteEditor(
 
     val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes()
     val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
-    val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
-    val showAddButton: Observable<Boolean> = _showAddButton.hide()
+    val isContextMenuShown: Observable<Boolean> = _showContextMenu.hide()
+    val isAddButtonShown: Observable<Boolean> = _showAddButton.hide()
 
     val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
         Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
     }.startWithItem(Optional.empty<SelectedNote>())
 
     // State
-    val selectedNote: Observable<Optional<StickyNote>> = userSelectedNote
+    val selectedStickyNote: Observable<Optional<StickyNote>> = userSelectedNote
         .switchMap { optSelectedNote ->
             if (optSelectedNote.isPresent) {
-                noteRepository.getNoteById(optSelectedNote.get().noteId)
+                getNoteById(optSelectedNote.get().noteId)
                     .map { Optional.ofNullable(it) }
             } else {
                 Observable.just(Optional.empty())
@@ -39,7 +39,7 @@ class StickyNoteEditor(
     val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.hide()
 
     // Component
-    val contextMenu = ContextMenu(selectedNote)
+    val contextMenu = ContextMenu(selectedStickyNote)
     val viewPort = ViewPort()
 
     fun setNoteSelected(id: String) {
@@ -67,6 +67,14 @@ class StickyNoteEditor(
     fun addNewNote() {
         val newNote = StickyNote.createRandomNote()
         noteRepository.createNote(newNote)
+    }
+
+    fun removeNote(id: String) {
+        noteRepository.deleteNote(id)
+    }
+
+    fun updateNote(stickyNote: StickyNote) {
+        noteRepository.putNote(stickyNote)
     }
 
     fun navigateToEditTextPage(stickyNote: StickyNote) {

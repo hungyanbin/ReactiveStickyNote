@@ -26,7 +26,7 @@ class ContextMenuViewModelTest {
     fun `onDeleteClicked called expect clear the selected note`() {
         every { noteRepository.getNoteById("1") } returns Observable.just(fakeNotes()[0])
 
-        val selectingNoteObserver = stickyNoteEditor.selectedNote.test()
+        val selectingNoteObserver = stickyNoteEditor.selectedStickyNote.test()
         stickyNoteEditor.selectNote("1")
         stickyNoteEditor.contextMenu.onDeleteClicked()
 

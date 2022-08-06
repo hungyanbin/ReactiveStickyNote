@@ -1,6 +1,5 @@
 package com.yanbin.reactivestickynote.editor.usecase
 
-import com.yanbin.reactivestickynote.editor.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
 import com.yanbin.reactivestickynote.editor.model.Position
 import io.reactivex.rxjava3.core.Observable
@@ -10,13 +9,12 @@ import io.reactivex.rxjava3.kotlin.addTo
 typealias NotePositionDelta = Pair<String, Position>
 
 class MoveNoteUseCase(
-    private val noteRepository: NoteRepository,
     private val noteMoveObservable: Observable<NotePositionDelta>
 ): BaseEditorUseCase() {
 
     override fun start(stickyNoteEditor: StickyNoteEditor) {
         val noteObservable = noteMoveObservable
-            .switchMap { (noteId, _) -> noteRepository.getNoteById(noteId) }
+            .switchMap { (noteId, _) -> stickyNoteEditor.getNoteById(noteId) }
         val deltaObservable = noteMoveObservable.map { (_, delta) -> delta }
 
         deltaObservable.withLatestFrom(stickyNoteEditor.userSelectedNote, noteObservable) { delta, optSelectedNote, note ->
@@ -26,7 +24,7 @@ class MoveNoteUseCase(
         }
             .mapOptional { it }
             .subscribe { note ->
-                noteRepository.putNote(note)
+                stickyNoteEditor.updateNote(note)
             }
             .addTo(disposableBag)
     }
