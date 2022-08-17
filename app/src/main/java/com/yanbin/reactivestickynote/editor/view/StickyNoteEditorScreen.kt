@@ -45,11 +45,8 @@ fun StickyNoteEditorScreen(
         ) {
             val showContextMenu by viewModel.showContextMenu.subscribeAsState(initial = false)
             val showAddButton by viewModel.showAddButton.subscribeAsState(initial = true)
-            val noteIds by viewModel.allVisibleNoteIds.subscribeAsState(initial = listOf())
-            val viewPortScale by viewModel.viewPortScale.subscribeAsState(initial = 1f)
-            val viewPortCenter by viewModel.viewPortCenter.subscribeAsState(initial = Position(0f, 0f))
 
-            ViewPortView(noteIds, viewPortScale, viewPortCenter, viewModel::transformViewPort)
+            StatefulViewPortView()
 
             AnimatedVisibility(
                 visible = showAddButton,

@@ -18,7 +18,6 @@ class StickyNoteEditor(
     private val openEditTextScreenSignal = PublishSubject.create<StickyNote>()
 
     val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes()
-    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
     val isContextMenuShown: Observable<Boolean> = _showContextMenu.hide()
     val isAddButtonShown: Observable<Boolean> = _showAddButton.hide()
 
@@ -40,7 +39,7 @@ class StickyNoteEditor(
 
     // Component
     val contextMenu = ContextMenu(selectedStickyNote)
-    val viewPort = ViewPort()
+    val viewPort = ViewPort(noteRepository)
 
     fun setNoteSelected(id: String) {
         noteRepository.setNoteSelection(id, accountService.getCurrentAccount())

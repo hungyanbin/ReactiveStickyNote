@@ -8,8 +8,10 @@ import com.yanbin.reactivestickynote.editor.vm.ContextMenuViewModel
 import com.yanbin.reactivestickynote.edittext.EditTextViewModel
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.editor.domain.ViewPort
 import com.yanbin.reactivestickynote.login.LoginViewModel
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteViewModel
+import com.yanbin.reactivestickynote.editor.vm.ViewPortViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -38,6 +40,12 @@ fun getNoteModule() =
         viewModel {
             ContextMenuViewModel(
                 contextMenu = get<StickyNoteEditor>().contextMenu
+            )
+        }
+
+        viewModel {
+            ViewPortViewModel(
+                viewPort = get<StickyNoteEditor>().viewPort
             )
         }
 
