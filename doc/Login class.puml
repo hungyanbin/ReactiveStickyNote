@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class LoginScreen {
+    + text: State<String>
+}
+class LoginViewModel {
+    + text: Observable<String>
+    + toEditorPage: Observable<Unit>
+    + onTextChanged(text: String)
+    + onEnterClicked()
+}
+interface AccountService {
+    + createAccount(name: String): Single<Account>
+    + getCurrentAccount(): Account
+    + hasAccount(): Boolean
+}
+
+LoginScreen --> LoginViewModel
+LoginViewModel --> AccountService
+
+
+
+hide empty members
+
+@enduml
