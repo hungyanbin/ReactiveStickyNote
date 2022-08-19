@@ -19,8 +19,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.editor.model.Position
-import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
 import com.yanbin.utils.subscribeBy
 import com.yanbin.utils.toMain

@@ -1,6 +1,6 @@
 package com.yanbin.reactivestickynote.editor.vm
 
-import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 
 data class StickyNoteUiModel(
     val stickyNote: StickyNote,

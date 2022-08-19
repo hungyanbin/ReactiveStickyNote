@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.editor.model
+package com.yanbin.reactivestickynote.stickynote.model
 
 data class YBSize(val width: Float, val height: Float) {
 

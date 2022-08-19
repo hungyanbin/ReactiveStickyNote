@@ -13,9 +13,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import com.yanbin.reactivestickynote.editor.model.Position
-import com.yanbin.reactivestickynote.editor.model.YBColor
-import com.yanbin.reactivestickynote.editor.vm.ContextMenuViewModel
+import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.editor.vm.ViewPortViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

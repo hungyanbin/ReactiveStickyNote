@@ -1,7 +1,7 @@
 package com.yanbin.reactivestickynote.editor.usecase
 
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
-import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.stickynote.model.Position
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 

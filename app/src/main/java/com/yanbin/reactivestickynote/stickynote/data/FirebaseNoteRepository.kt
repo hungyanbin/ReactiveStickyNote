@@ -1,8 +1,8 @@
-package com.yanbin.reactivestickynote.editor.data
+package com.yanbin.reactivestickynote.stickynote.data
 
 import com.google.firebase.firestore.*
 import com.yanbin.reactivestickynote.account.Account
-import com.yanbin.reactivestickynote.editor.model.*
+import com.yanbin.reactivestickynote.stickynote.model.*
 import com.yanbin.utils.toIO
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject

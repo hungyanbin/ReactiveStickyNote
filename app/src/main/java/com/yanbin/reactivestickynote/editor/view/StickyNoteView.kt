@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteUiModel
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel

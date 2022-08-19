@@ -3,7 +3,7 @@ package com.yanbin.reactivestickynote.editor.vm
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
-import com.yanbin.reactivestickynote.editor.model.Position
+import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.editor.usecase.*
 import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable

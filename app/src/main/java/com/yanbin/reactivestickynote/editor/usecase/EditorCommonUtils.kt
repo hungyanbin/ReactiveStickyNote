@@ -1,7 +1,7 @@
 package com.yanbin.reactivestickynote.editor.usecase
 
-import com.yanbin.reactivestickynote.editor.model.SelectedNote
-import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
+import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.utils.fold
 import java.util.*
 

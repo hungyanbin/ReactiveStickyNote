@@ -1,11 +1,9 @@
-package com.yanbin.reactivestickynote.editor.data
+package com.yanbin.reactivestickynote.stickynote.data
 
 import com.yanbin.reactivestickynote.account.Account
-import com.yanbin.reactivestickynote.editor.model.Position
-import com.yanbin.reactivestickynote.editor.model.SelectedNote
-import com.yanbin.reactivestickynote.editor.model.StickyNote
+import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
+import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap

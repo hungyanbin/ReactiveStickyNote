@@ -1,8 +1,8 @@
 package com.yanbin.reactivestickynote.editor.domain
 
 import com.yanbin.reactivestickynote.account.AccountService
-import com.yanbin.reactivestickynote.editor.data.NoteRepository
-import com.yanbin.reactivestickynote.editor.model.*
+import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.model.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
