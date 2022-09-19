@@ -7,17 +7,14 @@ import com.yanbin.reactivestickynote.model.Note
 import com.yanbin.reactivestickynote.model.Position
 import com.yanbin.reactivestickynote.model.YBColor
 import com.yanbin.utils.toIO
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class FirebaseNoteRepository(
-    firebaseFacade: FirebaseFacade
-): NoteRepository {
-    private val firestore = firebaseFacade.getFirestore()
+class FirebaseNoteRepository: NoteRepository {
+    private val firestore = FirebaseFirestore.getInstance()
     private val allNotesSubject = BehaviorSubject.create<List<Note>>()
     private val updatingNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
 

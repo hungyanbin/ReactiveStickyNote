@@ -22,6 +22,6 @@ fun getNoteModule() =
         }
 
         single<NoteRepository> {
-            FirebaseNoteRepository(get())
+            FirebaseNoteRepository()
         }
     }
