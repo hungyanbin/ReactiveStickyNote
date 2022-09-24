@@ -2,7 +2,7 @@ package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.account.AccountService
-import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.editor.usecase.*
 import com.yanbin.utils.fold
@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 class StickyNoteViewModel(
-    private val stickyNoteEditor: StickyNoteEditor,
+    private val editor: Editor,
     private val accountService: AccountService
 ): ViewModel() {
 
@@ -22,15 +22,15 @@ class StickyNoteViewModel(
 
     init {
         MoveNoteUseCase(moveNoteSubject.hide()).apply {
-            start(stickyNoteEditor)
+            start(editor)
             useCases.add(this)
         }
         ResizeNoteUseCase(resizeNoteSubject.hide()).apply {
-            start(stickyNoteEditor)
+            start(editor)
             useCases.add(this)
         }
         TapNoteUseCae(accountService, tapNoteSubject.hide()).apply {
-            start(stickyNoteEditor)
+            start(editor)
             useCases.add(this)
         }
     }
@@ -47,7 +47,7 @@ class StickyNoteViewModel(
         tapNoteSubject.onNext(id)
     }
 
-    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(stickyNoteEditor.getNoteById(id), stickyNoteEditor.selectedNotes, stickyNoteEditor.userSelectedNote)
+    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(editor.getNoteById(id), editor.selectedNotes, editor.userSelectedNote)
         .map { (note, selectedNotes, userSelectedNote) ->
             val selectedNote = selectedNotes.find { it.noteId == note.id }
             if (selectedNote != null) {

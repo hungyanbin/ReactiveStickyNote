@@ -7,7 +7,7 @@ import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.editor.vm.ContextMenuViewModel
 import com.yanbin.reactivestickynote.edittext.EditTextViewModel
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
-import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.login.LoginViewModel
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteViewModel
 import com.yanbin.reactivestickynote.editor.vm.ViewPortViewModel
@@ -32,19 +32,19 @@ fun getNoteModule() =
     module {
         viewModel {
             EditorViewModel(
-                stickyNoteEditor = get()
+                editor = get()
             )
         }
 
         viewModel {
             ContextMenuViewModel(
-                contextMenu = get<StickyNoteEditor>().contextMenu
+                contextMenu = get<Editor>().contextMenu
             )
         }
 
         viewModel {
             ViewPortViewModel(
-                viewPort = get<StickyNoteEditor>().viewPort
+                viewPort = get<Editor>().viewPort
             )
         }
 
@@ -56,14 +56,14 @@ fun getNoteModule() =
             )
         }
 
-        single { StickyNoteEditor(
+        single { Editor(
             noteRepository = get(),
             accountService = get()
         ) }
 
         viewModel {
             StickyNoteViewModel(
-                stickyNoteEditor = get(),
+                editor = get(),
                 accountService = get()
             )
         }

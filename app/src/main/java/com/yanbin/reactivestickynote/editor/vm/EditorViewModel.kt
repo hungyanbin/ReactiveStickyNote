@@ -1,45 +1,45 @@
 package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.editor.usecase.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 class EditorViewModel(
-    private val stickyNoteEditor: StickyNoteEditor
+    private val editor: Editor
 ): ViewModel() {
 
     private val tapCanvasSubject = PublishSubject.create<Unit>()
 
-    val openEditTextScreen: Observable<StickyNote> = stickyNoteEditor.openEditTextScreen
-    val showContextMenu = stickyNoteEditor.isContextMenuShown
-    val showAddButton = stickyNoteEditor.isAddButtonShown
+    val openEditTextScreen: Observable<StickyNote> = editor.openEditTextScreen
+    val showContextMenu = editor.isContextMenuShown
+    val showAddButton = editor.isAddButtonShown
 
     private val useCases: MutableList<BaseEditorUseCase> = mutableListOf()
 
     init {
         DeleteNoteUseCase().apply {
-            start(stickyNoteEditor)
+            start(editor)
             useCases.add(this)
         }
         ChangeColorUseCase().apply {
-            start(stickyNoteEditor)
+            start(editor)
             useCases.add(this)
         }
         EditTextUseCase().apply {
-            start(stickyNoteEditor)
+            start(editor)
             useCases.add(this)
         }
         TapCanvasUseCae(tapCanvasSubject.hide()).apply {
-            start(stickyNoteEditor)
+            start(editor)
             useCases.add(this)
         }
     }
 
     fun addNewNote() {
-        stickyNoteEditor.addNewNote()
+        editor.addNewNote()
     }
 
     fun tapCanvas() {

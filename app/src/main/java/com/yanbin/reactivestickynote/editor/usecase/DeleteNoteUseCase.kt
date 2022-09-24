@@ -1,25 +1,25 @@
 package com.yanbin.reactivestickynote.editor.usecase
 
 import com.yanbin.reactivestickynote.editor.domain.ContextMenuEvent
-import com.yanbin.reactivestickynote.editor.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.utils.filterInstance
 import io.reactivex.rxjava3.kotlin.addTo
 
 class DeleteNoteUseCase : BaseEditorUseCase() {
 
-    override fun start(stickyNoteEditor: StickyNoteEditor) {
-        stickyNoteEditor.contextMenu
+    override fun start(editor: Editor) {
+        editor.contextMenu
             .contextMenuEvents
             .filterInstance<ContextMenuEvent.DeleteNote>()
-            .withLatestFrom(stickyNoteEditor.userSelectedNote) { _, optSelectedNote ->
+            .withLatestFrom(editor.userSelectedNote) { _, optSelectedNote ->
                 optSelectedNote.map { note ->
                     note.noteId
                 }
             }.mapOptional { it }
             .subscribe { id ->
-                stickyNoteEditor.setNoteUnSelected(id)
-                stickyNoteEditor.removeNote(id)
-                stickyNoteEditor.showAddButton()
+                editor.setNoteUnSelected(id)
+                editor.removeNote(id)
+                editor.showAddButton()
             }
             .addTo(disposableBag)
     }

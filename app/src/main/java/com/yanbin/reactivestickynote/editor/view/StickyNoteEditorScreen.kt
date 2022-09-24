@@ -26,7 +26,7 @@ import com.yanbin.utils.toMain
 
 @ExperimentalAnimationApi
 @Composable
-fun StickyNoteEditorScreen(
+fun EditorScreen(
     viewModel: EditorViewModel,
     openEditTextScreen: (StickyNote) -> Unit
 ) {
