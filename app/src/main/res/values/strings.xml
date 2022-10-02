@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ReactiveStickyNote</string>
+    <string name="login_button_enter">Enter</string>
 </resources>

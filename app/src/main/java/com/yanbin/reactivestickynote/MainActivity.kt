@@ -7,12 +7,16 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.yanbin.reactivestickynote.domain.EditTextViewModel
-import com.yanbin.reactivestickynote.domain.EditorViewModel
-import com.yanbin.reactivestickynote.ui.screen.EditTextScreen
-import com.yanbin.reactivestickynote.ui.screen.EditorScreen
-import com.yanbin.reactivestickynote.ui.screen.Screen
+import com.yanbin.reactivestickynote.account.AccountService
+import com.yanbin.reactivestickynote.edittext.EditTextViewModel
+import com.yanbin.reactivestickynote.login.LoginScreen
+import com.yanbin.reactivestickynote.login.LoginViewModel
+import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
+import com.yanbin.reactivestickynote.ui.route.EditTextScreen
+import com.yanbin.reactivestickynote.editor.view.EditorScreen
+import com.yanbin.reactivestickynote.ui.route.Screen
 import com.yanbin.reactivestickynote.ui.theme.ReactiveStickyNoteTheme
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -24,7 +28,22 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             ReactiveStickyNoteTheme {
-                NavHost(navController, startDestination = Screen.Editor.route) {
+                val accountService by inject<AccountService>()
+                val startDestination = if (accountService.hasAccount()) {
+                    Screen.Editor.route
+                } else {
+                    Screen.Login.route
+                }
+
+                NavHost(navController, startDestination = startDestination) {
+                    composable(Screen.Login.route) {
+                        val viewModel by viewModel<LoginViewModel>()
+                        LoginScreen(
+                            loginViewModel = viewModel,
+                            toEditorPage = { navController.navigate(Screen.Editor.route) }
+                        )
+                    }
+
                     composable(Screen.Editor.route) {
                         val viewModel by viewModel<EditorViewModel>()
                         EditorScreen(
