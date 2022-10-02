@@ -1,33 +1,33 @@
 package com.yanbin.reactivestickynote.ui.vm
 
 import androidx.lifecycle.ViewModel
-import com.yanbin.reactivestickynote.domain.StickyNoteEditor
+import com.yanbin.reactivestickynote.domain.Editor
 import com.yanbin.reactivestickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 
 class EditorViewModel(
-    private val stickyNoteEditor: StickyNoteEditor
+    private val editor: Editor
 ): ViewModel() {
 
-    val openEditTextScreen: Observable<StickyNote> = stickyNoteEditor.openEditTextScreen
-    val allVisibleNoteIds = stickyNoteEditor.allVisibleNoteIds
-    val showContextMenu = stickyNoteEditor.showContextMenu
-    val showAddButton = stickyNoteEditor.showAddButton
+    val openEditTextScreen: Observable<StickyNote> = editor.openEditTextScreen
+    val allVisibleNoteIds = editor.allVisibleNoteIds
+    val showContextMenu = editor.showContextMenu
+    val showAddButton = editor.showAddButton
 
     init {
-        stickyNoteEditor.start()
+        editor.start()
     }
 
     fun addNewNote() {
-        stickyNoteEditor.addNewNote()
+        editor.addNewNote()
     }
 
     fun tapCanvas() {
-        stickyNoteEditor.clearSelection()
+        editor.clearSelection()
     }
 
     override fun onCleared() {
-        stickyNoteEditor.stop()
+        editor.stop()
     }
 
 }

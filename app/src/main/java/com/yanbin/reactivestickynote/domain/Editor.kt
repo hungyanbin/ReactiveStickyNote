@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.*
 
-class StickyNoteEditor(
+class Editor(
     private val noteRepository: NoteRepository
 ) {
 
