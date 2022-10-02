@@ -17,15 +17,17 @@ class InMemoryNoteRepository: NoteRepository {
 
     override fun putNote(stickyNote: StickyNote) {
         noteMap[stickyNote.id] = stickyNote
-        notes.onNext(noteMap.elements().toList())
+        sendNotesUpdateSignal()
     }
 
     override fun createNote(note: StickyNote) {
         noteMap[note.id] = note
+        sendNotesUpdateSignal()
     }
 
     override fun deleteNote(noteId: String) {
         noteMap.remove(noteId)
+        sendNotesUpdateSignal()
     }
 
     override fun getNoteById(id: String): Observable<StickyNote> {
@@ -44,17 +46,25 @@ class InMemoryNoteRepository: NoteRepository {
 
     override fun setNoteSelection(noteId: String, account: Account) {
         selectedNoteMap[account.id] = SelectedNote(noteId, account.userName)
-        selectedNotes.onNext(selectedNoteMap.elements().toList())
+        sendSelectedNotesUpdateSignal()
     }
 
     override fun removeNoteSelection(noteId: String, account: Account) {
         selectedNoteMap.remove(account.id)
-        selectedNotes.onNext(selectedNoteMap.elements().toList())
+        sendSelectedNotesUpdateSignal()
     }
 
     init {
         StickyNote.createRandomNote().let { note -> noteMap[note.id] = note }
         StickyNote.createRandomNote().let { note -> noteMap[note.id] = note }
+        sendNotesUpdateSignal()
+    }
+
+    private fun sendNotesUpdateSignal() {
         notes.onNext(noteMap.elements().toList())
+    }
+
+    private fun sendSelectedNotesUpdateSignal() {
+        selectedNotes.onNext(selectedNoteMap.elements().toList())
     }
 }
