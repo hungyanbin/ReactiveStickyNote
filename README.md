@@ -26,7 +26,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<img src="https://user-images.githubusercontent.com/7949400/124440143-e457ba00-ddac-11eb-93f4-1d3470001528.gif" width="400">
+<img src="https://user-images.githubusercontent.com/7949400/193445156-14faa4b6-1685-45b1-82ae-2d89dd4cb1e0.gif" width="400">
 
 The concept of reactive programming and declarative programming is more and more popular in recent years, there are a lot of libraries to help you do that, like RxJava, LiveData and Coroutine Flow. In this demo app, I will show you how to build a modern reactive Android app.
 
