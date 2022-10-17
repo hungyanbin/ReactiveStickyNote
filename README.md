@@ -1,80 +1,43 @@
-<!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#libraries">Libraries</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#project-overview">Project overview</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ol>
-</details>
+
+<img src="https://user-images.githubusercontent.com/7949400/196122834-49081b89-db61-4670-9751-57e8f7da3d12.png" width="400">
+
+
+## 專案介紹
+
+本專案為「從 0 到 0.99 Android 架構開發實戰 - 以便利貼應用程式為例」這本書的程式碼實作，下面的動畫展示了本專案的各個基本功能，包含了：
+
+- 選擇便利貼
+- 監聽並呈現其他使用者的操作
+- 放大、縮小、移動畫面
+- 編輯便利貼
+
+<img src="https://user-images.githubusercontent.com/7949400/193445156-14faa4b6-1685-45b1-82ae-2d89dd4cb1e0.gif" width="400">
+
+
+### 主要分支
+
+由於在書中的不同階段有對各類別以及方法做了蠻大幅度的修改，為了讓讀者方便閱讀每個階段的程式碼，在此切出下四個不同的分支：
+
+* [第1章～第4章](https://github.com/hungyanbin/ReactiveStickyNote/tree/Book_part_1)
+* [第5章～第8章](https://github.com/hungyanbin/ReactiveStickyNote/tree/Book_part_2)
+* [第10章](https://github.com/hungyanbin/ReactiveStickyNote/tree/Book_CH_10)
+* [第11章](https://github.com/hungyanbin/ReactiveStickyNote/tree/Book_CH_11)
 
 
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+## 勘誤表
 
-<img src="https://user-images.githubusercontent.com/7949400/124440143-e457ba00-ddac-11eb-93f4-1d3470001528.gif" width="400">
-
-The concept of reactive programming and declarative programming is more and more popular in recent years, there are a lot of libraries to help you do that, like RxJava, LiveData and Coroutine Flow. In this demo app, I will show you how to build a modern reactive Android app.
-
-<!-- LIBRARIES -->
-### Libraries
-
-The main purpose of this app is to demo reactive architecture as simple as possible, introduce too many libraries would make this demo app much harder to learn. So here I only use these four libraries:
-* [Jetpack Compose](https://developer.android.com/jetpack/compose)
-* [Android Architecture Component - ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel)
-* [Firebase Cloud FireStore](https://firebase.google.com/products/firestore)
-* [RxJava](https://github.com/ReactiveX/RxJava)
+感謝您閱讀本書，如果有發現任何在書中有錯誤或是有爭議的地方，請在本專案中開一個新的 Issue ，作者將會以最快的速度回應以及修正！
 
 
-
-<!-- GETTING STARTED -->
-## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-### Prerequisites
-
-Android Studio preview: [https://developer.android.com/studio/preview](https://developer.android.com/studio/preview)
+### 目前尚未有任何錯誤回報
 
 
-### Installation
+## 特別感謝
 
-1. Add a Firebase project and get `google-service.json` at [Firebase console](https://console.firebase.google.com/)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/hungyanbin/ResctiveStickyNote.git
-   ```
-3. Copy `google-service.json` to this folder: `ReactiveStickyNote/app/`
-4. Hit Run on Android Studio
+[Andy](https://github.com/bng86), [Tina](https://github.com/TsaiTingLin), [Jintin](https://github.com/Jintin) 抽出珍貴的時間幫忙審稿。
 
-
-
-<!-- PROJECT OVERVIEW -->
-## Project overview
-
-![Architecture image][architecture-image]
-
-#### Topics
-- Backpressure
-- Multicasting
-- Threading
-- Binding
-- Error handling
+以及 GDG Taipei Organizer Kevin 的大力推薦
 
 
 <!-- LICENSE -->
