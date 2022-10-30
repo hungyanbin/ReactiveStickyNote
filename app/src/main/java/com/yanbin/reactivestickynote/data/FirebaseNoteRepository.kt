@@ -93,10 +93,10 @@ class FirebaseNoteRepository: NoteRepository {
 
     private fun documentToNotes(document: QueryDocumentSnapshot): Note {
         val data: Map<String, Any> = document.data
-        val text = data[FIELD_TEXT] as String
-        val color = YBColor(data[FIELD_COLOR] as Long)
-        val positionX = data[FIELD_POSITION_X] as Double? ?: 0f
-        val positionY = data[FIELD_POSITION_Y] as Double? ?: 0f
+        val text = data[FIELD_TEXT] as? String? ?: ""
+        val color = YBColor(data[FIELD_COLOR] as? Long? ?: 0)
+        val positionX = data[FIELD_POSITION_X] as? Double? ?: 0f
+        val positionY = data[FIELD_POSITION_Y] as? Double? ?: 0f
         val position = Position(positionX.toFloat(), positionY.toFloat())
         return Note(document.id, text, position, color)
     }
