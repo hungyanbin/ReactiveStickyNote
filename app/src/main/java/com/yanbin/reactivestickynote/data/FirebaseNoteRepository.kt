@@ -130,10 +130,10 @@ class FirebaseNoteRepository : NoteRepository {
 
     private fun documentToNotes(document: DocumentSnapshot?): StickyNote? {
         val data: Map<String, Any> = document?.data as? Map<String, Any> ?: return null
-        val text = data[FIELD_TEXT] as String
-        val color = YBColor(data[FIELD_COLOR] as Long)
-        val positionX = data[FIELD_POSITION_X] as Double? ?: 0f
-        val positionY = data[FIELD_POSITION_Y] as Double? ?: 0f
+        val text = data[FIELD_TEXT] as String? ?: ""
+        val color = YBColor(data[FIELD_COLOR] as Long? ?: 0)
+        val positionX = data[FIELD_POSITION_X] as? Double? ?: 0f
+        val positionY = data[FIELD_POSITION_Y] as? Double? ?: 0f
         val position = Position(positionX.toFloat(), positionY.toFloat())
         return StickyNote(document.id, text, position, color)
     }
