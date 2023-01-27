@@ -14,6 +14,13 @@ object Dependencies {
         const val lifecycleKts = "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
     }
 
+    object Ktor {
+        const val clientCore = "io.ktor:ktor-client-core:${Version.ktor}"
+        const val clientCio = "io.ktor:ktor-client-cio:${Version.ktor}"
+        const val clientWebsocket = "io.ktor:ktor-client-websockets:${Version.ktor}"
+        const val serializationProtobuf = "io.ktor:ktor-serialization-kotlinx-protobuf:${Version.ktor}"
+    }
+
     object Koin {
         const val android = "io.insert-koin:koin-android:${Version.koin}"
     }
@@ -42,6 +49,7 @@ object Version {
     const val composeLib = "1.2.0-rc03"
     const val koin = "3.0.2"
     const val mockk = "1.12.4"
+    const val ktor = "2.2.2"
 
     object Android {
         const val buildTool = "30.0.3"

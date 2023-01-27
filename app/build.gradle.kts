@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -55,6 +56,11 @@ dependencies {
     implementation(Dependencies.Android.composeUITooling)
     implementation(Dependencies.Android.rxJava3)
     implementation(Dependencies.Android.navigation)
+    // Ktor
+    implementation(Dependencies.Ktor.clientCore)
+    implementation(Dependencies.Ktor.clientCio)
+    implementation(Dependencies.Ktor.clientWebsocket)
+    implementation(Dependencies.Ktor.serializationProtobuf)
     // Koin
     implementation(Dependencies.Koin.android)
     // RxJava

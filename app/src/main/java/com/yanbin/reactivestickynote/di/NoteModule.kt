@@ -11,6 +11,7 @@ import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.login.LoginViewModel
 import com.yanbin.reactivestickynote.editor.vm.StickyNoteViewModel
 import com.yanbin.reactivestickynote.editor.vm.ViewPortViewModel
+import com.yanbin.reactivestickynote.stickynote.data.LocalHostNoteRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -69,6 +70,7 @@ fun getNoteModule() =
         }
 
         single<NoteRepository> {
-            FirebaseNoteRepository()
+//            FirebaseNoteRepository()
+            LocalHostNoteRepository()
         }
     }
