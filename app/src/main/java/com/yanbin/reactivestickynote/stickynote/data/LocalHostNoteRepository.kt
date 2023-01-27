@@ -15,6 +15,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.serialization.protobuf.ProtoBuf
 import java.util.Optional
@@ -38,9 +39,20 @@ class LocalHostNoteRepository: NoteRepository {
                 path = "/notes"
             ) {
                 val outputRoutine = launch { handleOutputMessages() }
+                val queryRoutine = launch { sendQueryMessage() }
                 outputRoutine.join()
+                queryRoutine.cancelAndJoin()
             }
             client.close()
+        }
+    }
+
+    private suspend fun DefaultClientWebSocketSession.sendQueryMessage() {
+        try {
+            val message = SocketMessage(SocketMessage.Type.Query, objectId = "")
+            sendSerialized(message)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error while sending query message ", e)
         }
     }
 
