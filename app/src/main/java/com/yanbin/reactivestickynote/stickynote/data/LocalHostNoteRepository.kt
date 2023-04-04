@@ -26,6 +26,7 @@ class LocalHostNoteRepository: NoteRepository {
     private var clientWebSocketSession: DefaultClientWebSocketSession? = null
     // TODO refactor to use scope in ViewModel
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val logIncomingMessage = true
 
     init {
         val client = HttpClient {
@@ -67,10 +68,7 @@ class LocalHostNoteRepository: NoteRepository {
             for (message in incoming) {
                 when (message) {
                     is Frame.Binary -> {
-                        tryUpdateNotes(message)
-                            .onFailure {
-                                tryUpdatePos(message)
-                            }
+                        serializeMessage(message)
                     }
                     is Frame.Text -> {
                         Log.i(TAG, "Message from server: ${message.readText()} ")
@@ -85,34 +83,40 @@ class LocalHostNoteRepository: NoteRepository {
         }
     }
 
-    private suspend fun DefaultClientWebSocketSession.tryUpdateNotes(message: Frame): Result<Unit> {
+    private suspend fun DefaultClientWebSocketSession.serializeMessage(message: Frame): Result<Unit> {
         return runCatching {
-            tryToSerialize<List<NoteDto>>(message,
+            tryToSerialize<FrameContract>(message,
                 converter as KotlinxWebsocketSerializationConverter
-            )?.let { noteDtos ->
-                allNotesSubject.onNext(noteDtos.map { it.toStickyNote() })
+            )?.let { frame: FrameContract ->
+                if (logIncomingMessage) Log.i(TAG, "Message from server: $frame ")
+                if (frame.isValid()) {
+                    when (frame.type) {
+                        FrameContract.Type.AllNotes -> {
+                            updateAllNotes(frame.notes)
+                        }
+                        FrameContract.Type.UpdateNote -> {
+                            updateNotePosition(frame.updatedAttributes!!)
+                        }
+                    }
+                }
             }
         }
     }
 
-    private suspend fun DefaultClientWebSocketSession.tryUpdatePos(message: Frame): Result<Unit> {
-        return runCatching {
-            tryToSerialize<UpdatedAttributes>(
-                message,
-                converter as KotlinxWebsocketSerializationConverter
-            )?.let { command ->
-                val currentNotes = allNotesSubject.value?.toMutableList() ?: return@let
-                val updatedIndex = currentNotes.indexOfFirst { it.id == command.objectId }
-                val selectionId = selectedNotesSubject.value?.first()?.noteId ?: ""
-                if (selectionId == command.objectId) return@let
+    private fun updateAllNotes(notes: List<NoteDto>) {
+        allNotesSubject.onNext(notes.map { it.toStickyNote() })
+    }
 
-                currentNotes[updatedIndex] = currentNotes[updatedIndex].copy(
-                    position = Position(x = command.position.x, y = command.position.y)
-                )
-                allNotesSubject.onNext(currentNotes)
+    private fun updateNotePosition(updatedAttributes: UpdatedAttributes) {
+        val currentNotes = allNotesSubject.value?.toMutableList() ?: throw IllegalStateException("No notes")
+        val updatedIndex = currentNotes.indexOfFirst { it.id == updatedAttributes.objectId }
+        val selectionId = selectedNotesSubject.value?.first()?.noteId ?: ""
+        if (selectionId == updatedAttributes.objectId) throw IllegalStateException("No selection")
 
-            }
-        }
+        currentNotes[updatedIndex] = currentNotes[updatedIndex].copy(
+            position = Position(x = updatedAttributes.position.x, y = updatedAttributes.position.y)
+        )
+        allNotesSubject.onNext(currentNotes)
     }
 
     private suspend inline fun <reified T> DefaultClientWebSocketSession.tryToSerialize(frame: Frame, converter: KotlinxWebsocketSerializationConverter): T? {

@@ -4,7 +4,7 @@ import com.yanbin.common.YBPointF
 import kotlinx.serialization.Serializable
 
 @Serializable
-class UpdatedAttributes(
+data class UpdatedAttributes(
     val objectId: String,
     val position: YBPointF
 )
