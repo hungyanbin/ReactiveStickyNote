@@ -1,8 +1,8 @@
 package com.yanbin.reactivestickynote.editor.usecase
 
+import com.yanbin.common.YBSize
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
-import com.yanbin.reactivestickynote.stickynote.model.YBSize
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 

@@ -1,9 +1,9 @@
 package com.yanbin.reactivestickynote.stickynote.data
 
+import com.yanbin.common.YBSize
 import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.stickynote.model.YBColor
-import com.yanbin.reactivestickynote.stickynote.model.YBSize
 import kotlinx.serialization.Serializable
 
 @Serializable

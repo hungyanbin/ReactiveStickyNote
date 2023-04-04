@@ -1,5 +1,6 @@
 package com.yanbin.reactivestickynote.stickynote.model
 
+import com.yanbin.common.YBSize
 import java.util.*
 import kotlin.random.Random
 

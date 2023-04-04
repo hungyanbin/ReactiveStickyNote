@@ -1,6 +1,7 @@
 package com.yanbin.reactivestickynote.stickynote.data
 
 import com.google.firebase.firestore.*
+import com.yanbin.common.YBSize
 import com.yanbin.reactivestickynote.account.Account
 import com.yanbin.reactivestickynote.stickynote.model.*
 import com.yanbin.utils.toIO

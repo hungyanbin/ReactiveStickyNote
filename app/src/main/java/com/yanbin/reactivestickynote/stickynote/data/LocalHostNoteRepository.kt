@@ -1,7 +1,9 @@
 package com.yanbin.reactivestickynote.stickynote.data
 
 import android.util.Log
+import com.yanbin.common.YBPointF
 import com.yanbin.reactivestickynote.account.Account
+import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.ktor.client.*
@@ -13,16 +15,17 @@ import io.ktor.util.reflect.*
 import io.ktor.websocket.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.serialization.protobuf.ProtoBuf
-import java.util.Optional
+import java.util.*
 
 class LocalHostNoteRepository: NoteRepository {
 
     private val allNotesSubject = BehaviorSubject.create<List<StickyNote>>()
+    private val selectedNotesSubject = BehaviorSubject.createDefault(listOf(SelectedNote("", "")))
+    private var clientWebSocketSession: DefaultClientWebSocketSession? = null
+    // TODO refactor to use scope in ViewModel
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         val client = HttpClient {
@@ -30,14 +33,17 @@ class LocalHostNoteRepository: NoteRepository {
                 contentConverter = KotlinxWebsocketSerializationConverter(ProtoBuf)
             }
         }
-        // TODO check scope
-        GlobalScope.launch(Dispatchers.IO) {
+        val hostEmulator = "10.0.2.2"
+        val hostDevice = "192.168.1.102"
+
+        coroutineScope.launch(Dispatchers.IO) {
             client.webSocket(
                 method = HttpMethod.Get,
-                host = "10.0.2.2",
+                host = hostEmulator,
                 port = 8081,
                 path = "/notes"
             ) {
+                clientWebSocketSession = this
                 val outputRoutine = launch { handleOutputMessages() }
                 val queryRoutine = launch { sendQueryMessage() }
                 outputRoutine.join()
@@ -61,10 +67,10 @@ class LocalHostNoteRepository: NoteRepository {
             for (message in incoming) {
                 when (message) {
                     is Frame.Binary -> {
-                        val notes = tryToSerialize<List<NoteDto>>(message,
-                            converter as KotlinxWebsocketSerializationConverter
-                        )!!
-                        allNotesSubject.onNext(notes.map { it.toStickyNote() })
+                        tryUpdateNotes(message)
+                            .onFailure {
+                                tryUpdatePos(message)
+                            }
                     }
                     is Frame.Text -> {
                         Log.i(TAG, "Message from server: ${message.readText()} ")
@@ -76,6 +82,36 @@ class LocalHostNoteRepository: NoteRepository {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error while receiving: ", e)
+        }
+    }
+
+    private suspend fun DefaultClientWebSocketSession.tryUpdateNotes(message: Frame): Result<Unit> {
+        return runCatching {
+            tryToSerialize<List<NoteDto>>(message,
+                converter as KotlinxWebsocketSerializationConverter
+            )?.let { noteDtos ->
+                allNotesSubject.onNext(noteDtos.map { it.toStickyNote() })
+            }
+        }
+    }
+
+    private suspend fun DefaultClientWebSocketSession.tryUpdatePos(message: Frame): Result<Unit> {
+        return runCatching {
+            tryToSerialize<UpdatedAttributes>(
+                message,
+                converter as KotlinxWebsocketSerializationConverter
+            )?.let { command ->
+                val currentNotes = allNotesSubject.value?.toMutableList() ?: return@let
+                val updatedIndex = currentNotes.indexOfFirst { it.id == command.objectId }
+                val selectionId = selectedNotesSubject.value?.first()?.noteId ?: ""
+                if (selectionId == command.objectId) return@let
+
+                currentNotes[updatedIndex] = currentNotes[updatedIndex].copy(
+                    position = Position(x = command.position.x, y = command.position.y)
+                )
+                allNotesSubject.onNext(currentNotes)
+
+            }
         }
     }
 
@@ -112,7 +148,7 @@ class LocalHostNoteRepository: NoteRepository {
     }
 
     override fun getAllSelectedNotes(): Observable<List<SelectedNote>> {
-        return Observable.just(emptyList())
+        return selectedNotesSubject.hide()
     }
 
     override fun getNoteById(id: String): Observable<StickyNote> {
@@ -122,7 +158,25 @@ class LocalHostNoteRepository: NoteRepository {
     }
 
     override fun putNote(stickyNote: StickyNote) {
-
+        selectedNotesSubject.onNext(
+            listOf(SelectedNote(stickyNote.id, "Yachu"))
+        )
+        coroutineScope.launch(Dispatchers.IO) {
+            clientWebSocketSession?.sendSerialized(
+                SocketMessage(
+                    SocketMessage.Type.Update,
+                    objectId = stickyNote.id,
+                    content = SocketMessage.Attribute.NewPosition to YBPointF(
+                        stickyNote.position.x,
+                        stickyNote.position.y
+                    )
+                )
+            )
+        }
+        val currentNotes = allNotesSubject.value?.toMutableList() ?: return
+        val updatedIndex = currentNotes.indexOfFirst { it.id == stickyNote.id }
+        currentNotes[updatedIndex] = stickyNote
+        allNotesSubject.onNext(currentNotes)
     }
 
     override fun createNote(stickyNote: StickyNote) {
