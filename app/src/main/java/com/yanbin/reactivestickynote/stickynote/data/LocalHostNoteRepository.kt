@@ -90,29 +90,46 @@ class LocalHostNoteRepository: NoteRepository {
                 if (logIncomingMessage) Log.i(TAG, "Message from server: $frame ")
                 if (frame.isValid()) {
                     when (frame.type) {
-                        FrameContract.Type.AllNotes -> {
-                            updateAllNotes(frame.notes)
-                        }
-                        FrameContract.Type.UpdateNote -> {
-                            updateLocalNoteFromServer(frame.updatedNoteAttributes!!)
-                        }
+                        FrameContract.Type.AllNotes -> updateAllNotes(frame.notes)
+                        FrameContract.Type.UpdateNote -> updateLocalNoteFromServer(frame)
+                        FrameContract.Type.Create -> newNoteCreatedFromServer(frame)
+                        FrameContract.Type.Delete -> deleteNoteFromServer(frame)
                     }
                 }
             }
         }
     }
 
+    private fun deleteNoteFromServer(frame: FrameContract) {
+        val currentNotes = allNotesSubject.value?.toMutableList() ?: throw IllegalStateException("No notes")
+        val updatedNoteAttributes = frame.updatedNoteAttributes ?: throw IllegalStateException("Missing updatedNoteAttributes")
+        val deletedId = updatedNoteAttributes.objectId
+        currentNotes.removeIf { it.id == deletedId }
+
+        allNotesSubject.onNext(currentNotes)
+    }
+
     private fun updateAllNotes(notes: List<NoteDto>) {
         allNotesSubject.onNext(notes.map { it.toStickyNote() })
     }
 
-    private fun updateLocalNoteFromServer(updatedNoteAttributes: UpdatedNoteAttributes) {
+    private fun updateLocalNoteFromServer(frame: FrameContract) {
+        val updatedNoteAttributes = frame.updatedNoteAttributes ?: throw IllegalStateException("Missing updatedNoteAttributes")
         val currentNotes = allNotesSubject.value?.toMutableList() ?: throw IllegalStateException("No notes")
         val updatedIndex = currentNotes.indexOfFirst { it.id == updatedNoteAttributes.objectId }
         val selectionId = selectedNotesSubject.value?.first()?.noteId ?: ""
         if (selectionId == updatedNoteAttributes.objectId) throw IllegalStateException("No selection")
 
         currentNotes[updatedIndex] = updatedNoteAttributes.updateNote(currentNotes[updatedIndex])
+        allNotesSubject.onNext(currentNotes)
+    }
+
+    private fun newNoteCreatedFromServer(frame: FrameContract) {
+        val updatedNoteAttributes = frame.updatedNoteAttributes ?: throw IllegalStateException("Missing updatedNoteAttributes")
+        val currentNotes = allNotesSubject.value?.toMutableList() ?: throw IllegalStateException("No notes")
+        val newNote = updatedNoteAttributes.toStickyNote()
+
+        currentNotes.add(newNote)
         allNotesSubject.onNext(currentNotes)
     }
 
@@ -176,11 +193,19 @@ class LocalHostNoteRepository: NoteRepository {
     }
 
     override fun createNote(stickyNote: StickyNote) {
-
+        coroutineScope.launch(Dispatchers.IO) {
+            clientWebSocketSession?.sendSerialized(
+                SocketMessage.create(UpdatedNoteAttributes.fromStickyNote(stickyNote))
+            )
+        }
     }
 
     override fun deleteNote(noteId: String) {
-
+        coroutineScope.launch(Dispatchers.IO) {
+            clientWebSocketSession?.sendSerialized(
+                SocketMessage.delete(noteId)
+            )
+        }
     }
 
     override fun setNoteSelection(noteId: String, account: Account) {

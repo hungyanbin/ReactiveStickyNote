@@ -14,7 +14,7 @@ class SocketMessage(
     val updatedAttributes: UpdatedNoteAttributes?,
 ) {
     enum class Type {
-        Query, Update
+        Query, Update, Create, Delete
     }
 
     companion object {
@@ -25,11 +25,19 @@ class SocketMessage(
         fun update(updatedAttributes: UpdatedNoteAttributes): SocketMessage {
             return SocketMessage(Type.Update, updatedAttributes)
         }
+
+        fun create(updatedAttributes: UpdatedNoteAttributes): SocketMessage {
+            return SocketMessage(Type.Create, updatedAttributes)
+        }
+
+        fun delete(id: String): SocketMessage {
+            return SocketMessage(Type.Delete, UpdatedNoteAttributes.fromAttributes(id, emptyList()))
+        }
     }
 }
 
 @Serializable
-class UpdatedNoteAttributes(
+data class UpdatedNoteAttributes(
     val objectId: String,
     val position: YBPointF?,
     val size: YBSize?,
@@ -50,6 +58,15 @@ class UpdatedNoteAttributes(
             YBColor(updatedColor)
         )
     }
+
+    fun toStickyNote(): StickyNote {
+        requireNotNull(position)
+        requireNotNull(size)
+        requireNotNull(color)
+        requireNotNull(text)
+        val newPosition = Position(position.x, position.y)
+        return StickyNote(objectId, text, newPosition, size, YBColor(color))
+    }
     companion object {
         fun fromAttributes(noteId: String, attributes: List<NoteAttribute>): UpdatedNoteAttributes {
             var position: YBPointF? = null
@@ -65,6 +82,16 @@ class UpdatedNoteAttributes(
                 }
             }
             return UpdatedNoteAttributes(noteId, position, size, color, text)
+        }
+
+        fun fromStickyNote(stickyNote: StickyNote): UpdatedNoteAttributes {
+            return UpdatedNoteAttributes(
+                stickyNote.id,
+                YBPointF(stickyNote.position.x, stickyNote.position.y),
+                stickyNote.size,
+                stickyNote.color.color,
+                stickyNote.text
+            )
         }
     }
 }

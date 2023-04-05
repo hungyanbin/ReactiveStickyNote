@@ -9,11 +9,13 @@ data class FrameContract(
     val updatedNoteAttributes: UpdatedNoteAttributes?,
 ) {
     enum class Type {
-        AllNotes, UpdateNote
+        AllNotes, UpdateNote, Create, Delete
     }
 
     fun isValid() = when (type) {
         Type.AllNotes -> notes.isNotEmpty()
         Type.UpdateNote -> updatedNoteAttributes != null
+        Type.Create -> updatedNoteAttributes != null
+        Type.Delete -> updatedNoteAttributes != null
     }
 }
