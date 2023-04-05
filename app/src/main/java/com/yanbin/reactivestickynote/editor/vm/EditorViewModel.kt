@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.editor.usecase.*
+import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 class EditorViewModel(
-    private val editor: Editor
+    private val editor: Editor,
+    private val noteRepository: NoteRepository
 ): ViewModel() {
 
     private val tapCanvasSubject = PublishSubject.create<Unit>()
@@ -21,19 +23,19 @@ class EditorViewModel(
 
     init {
         DeleteNoteUseCase().apply {
-            start(editor)
+            start(editor, noteRepository)
             useCases.add(this)
         }
         ChangeColorUseCase().apply {
-            start(editor)
+            start(editor, noteRepository)
             useCases.add(this)
         }
         EditTextUseCase().apply {
-            start(editor)
+            start(editor, noteRepository)
             useCases.add(this)
         }
         TapCanvasUseCae(tapCanvasSubject.hide()).apply {
-            start(editor)
+            start(editor, noteRepository)
             useCases.add(this)
         }
     }

@@ -2,6 +2,7 @@ package com.yanbin.reactivestickynote.editor.usecase
 
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.domain.Editor
+import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -11,7 +12,7 @@ class TapNoteUseCae(
     private val tapNoteObservable: Observable<String>
 ): BaseEditorUseCase() {
 
-    override fun start(editor: Editor) {
+    override fun start(editor: Editor, noteRepository: NoteRepository) {
         tapNoteObservable.withLatestFrom(editor.selectedNotes) { id, selectedNotes ->
                 id to selectedNotes
             }.subscribe { (id, selectedNotes) ->

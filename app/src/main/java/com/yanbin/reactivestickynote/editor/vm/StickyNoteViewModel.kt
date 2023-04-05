@@ -5,6 +5,7 @@ import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.editor.usecase.*
+import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
@@ -12,6 +13,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class StickyNoteViewModel(
     private val editor: Editor,
+    private val noteRepository: NoteRepository,
     private val accountService: AccountService
 ): ViewModel() {
 
@@ -22,15 +24,15 @@ class StickyNoteViewModel(
 
     init {
         MoveNoteUseCase(moveNoteSubject.hide()).apply {
-            start(editor)
+            start(editor, noteRepository)
             useCases.add(this)
         }
         ResizeNoteUseCase(resizeNoteSubject.hide()).apply {
-            start(editor)
+            start(editor, noteRepository)
             useCases.add(this)
         }
         TapNoteUseCae(accountService, tapNoteSubject.hide()).apply {
-            start(editor)
+            start(editor, noteRepository)
             useCases.add(this)
         }
     }

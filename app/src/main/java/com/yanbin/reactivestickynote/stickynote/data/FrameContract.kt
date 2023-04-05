@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class FrameContract(
     val type: Type,
     val notes: List<NoteDto>,
-    val updatedAttributes: UpdatedAttributes?
+    val updatedNoteAttributes: UpdatedNoteAttributes?,
 ) {
     enum class Type {
         AllNotes, UpdateNote
@@ -14,6 +14,6 @@ data class FrameContract(
 
     fun isValid() = when (type) {
         Type.AllNotes -> notes.isNotEmpty()
-        Type.UpdateNote -> updatedAttributes != null
+        Type.UpdateNote -> updatedNoteAttributes != null
     }
 }

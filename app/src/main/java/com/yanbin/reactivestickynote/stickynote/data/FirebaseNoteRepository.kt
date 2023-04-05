@@ -93,6 +93,10 @@ class FirebaseNoteRepository : NoteRepository {
         updatingNoteSubject.onNext(Optional.of(stickyNote))
     }
 
+    override fun updateNote(noteId: String, attributes: List<NoteAttribute>) {
+        TODO("Not yet implemented")
+    }
+
     override fun deleteNote(noteId: String) {
         registrations[noteId]?.remove()
         noteSubjects[noteId]?.onComplete()

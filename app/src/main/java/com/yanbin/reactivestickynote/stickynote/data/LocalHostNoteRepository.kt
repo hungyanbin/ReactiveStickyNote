@@ -1,9 +1,8 @@
 package com.yanbin.reactivestickynote.stickynote.data
 
 import android.util.Log
-import com.yanbin.common.YBPointF
 import com.yanbin.reactivestickynote.account.Account
-import com.yanbin.reactivestickynote.stickynote.model.Position
+import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.ktor.client.*
@@ -56,7 +55,7 @@ class LocalHostNoteRepository: NoteRepository {
 
     private suspend fun DefaultClientWebSocketSession.sendQueryMessage() {
         try {
-            val message = SocketMessage(SocketMessage.Type.Query, objectId = "")
+            val message = SocketMessage.query()
             sendSerialized(message)
         } catch (e: Exception) {
             Log.e(TAG, "Error while sending query message ", e)
@@ -95,7 +94,7 @@ class LocalHostNoteRepository: NoteRepository {
                             updateAllNotes(frame.notes)
                         }
                         FrameContract.Type.UpdateNote -> {
-                            updateNotePosition(frame.updatedAttributes!!)
+                            updateLocalNoteFromServer(frame.updatedNoteAttributes!!)
                         }
                     }
                 }
@@ -107,15 +106,13 @@ class LocalHostNoteRepository: NoteRepository {
         allNotesSubject.onNext(notes.map { it.toStickyNote() })
     }
 
-    private fun updateNotePosition(updatedAttributes: UpdatedAttributes) {
+    private fun updateLocalNoteFromServer(updatedNoteAttributes: UpdatedNoteAttributes) {
         val currentNotes = allNotesSubject.value?.toMutableList() ?: throw IllegalStateException("No notes")
-        val updatedIndex = currentNotes.indexOfFirst { it.id == updatedAttributes.objectId }
+        val updatedIndex = currentNotes.indexOfFirst { it.id == updatedNoteAttributes.objectId }
         val selectionId = selectedNotesSubject.value?.first()?.noteId ?: ""
-        if (selectionId == updatedAttributes.objectId) throw IllegalStateException("No selection")
+        if (selectionId == updatedNoteAttributes.objectId) throw IllegalStateException("No selection")
 
-        currentNotes[updatedIndex] = currentNotes[updatedIndex].copy(
-            position = Position(x = updatedAttributes.position.x, y = updatedAttributes.position.y)
-        )
+        currentNotes[updatedIndex] = updatedNoteAttributes.updateNote(currentNotes[updatedIndex])
         allNotesSubject.onNext(currentNotes)
     }
 
@@ -161,26 +158,43 @@ class LocalHostNoteRepository: NoteRepository {
         }
     }
 
-    override fun putNote(stickyNote: StickyNote) {
+    override fun updateNote(noteId: String, attributes: List<NoteAttribute>) {
         selectedNotesSubject.onNext(
-            listOf(SelectedNote(stickyNote.id, "Yachu"))
+            listOf(SelectedNote(noteId, "Yachu"))
         )
+
+        val updatedNoteAttributes = UpdatedNoteAttributes.fromAttributes(noteId, attributes)
         coroutineScope.launch(Dispatchers.IO) {
             clientWebSocketSession?.sendSerialized(
-                SocketMessage(
-                    SocketMessage.Type.Update,
-                    objectId = stickyNote.id,
-                    content = SocketMessage.Attribute.NewPosition to YBPointF(
-                        stickyNote.position.x,
-                        stickyNote.position.y
-                    )
-                )
+                SocketMessage.update(updatedNoteAttributes)
             )
         }
         val currentNotes = allNotesSubject.value?.toMutableList() ?: return
-        val updatedIndex = currentNotes.indexOfFirst { it.id == stickyNote.id }
-        currentNotes[updatedIndex] = stickyNote
+        val updatedIndex = currentNotes.indexOfFirst { it.id == noteId }
+        currentNotes[updatedIndex] = updatedNoteAttributes.updateNote(currentNotes[updatedIndex])
         allNotesSubject.onNext(currentNotes)
+    }
+
+    override fun putNote(stickyNote: StickyNote) {
+//        selectedNotesSubject.onNext(
+//            listOf(SelectedNote(stickyNote.id, "Yachu"))
+//        )
+//        coroutineScope.launch(Dispatchers.IO) {
+//            clientWebSocketSession?.sendSerialized(
+//                SocketMessage(
+//                    SocketMessage.Type.Update,
+//                    objectId = stickyNote.id,
+//                    content = SocketMessage.Attribute.NewPosition to YBPointF(
+//                        stickyNote.position.x,
+//                        stickyNote.position.y
+//                    )
+//                )
+//            )
+//        }
+//        val currentNotes = allNotesSubject.value?.toMutableList() ?: return
+//        val updatedIndex = currentNotes.indexOfFirst { it.id == stickyNote.id }
+//        currentNotes[updatedIndex] = stickyNote
+//        allNotesSubject.onNext(currentNotes)
     }
 
     override fun createNote(stickyNote: StickyNote) {
@@ -192,11 +206,13 @@ class LocalHostNoteRepository: NoteRepository {
     }
 
     override fun setNoteSelection(noteId: String, account: Account) {
-
+        selectedNotesSubject.onNext(
+            listOf(SelectedNote(noteId, account.userName))
+        )
     }
 
     override fun removeNoteSelection(noteId: String, account: Account) {
-
+        selectedNotesSubject.onNext(emptyList())
     }
 
     companion object {

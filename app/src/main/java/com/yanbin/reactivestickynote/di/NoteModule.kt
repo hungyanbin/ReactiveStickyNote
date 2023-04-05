@@ -33,7 +33,8 @@ fun getNoteModule() =
     module {
         viewModel {
             EditorViewModel(
-                editor = get()
+                editor = get(),
+                noteRepository = get()
             )
         }
 
@@ -65,6 +66,7 @@ fun getNoteModule() =
         viewModel {
             StickyNoteViewModel(
                 editor = get(),
+                noteRepository = get(),
                 accountService = get()
             )
         }

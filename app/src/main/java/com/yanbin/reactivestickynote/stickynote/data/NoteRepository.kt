@@ -1,8 +1,7 @@
 package com.yanbin.reactivestickynote.stickynote.data
 
 import com.yanbin.reactivestickynote.account.Account
-import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
-import com.yanbin.reactivestickynote.stickynote.model.StickyNote
+import com.yanbin.reactivestickynote.stickynote.model.*
 import io.reactivex.rxjava3.core.Observable
 
 interface NoteRepository {
@@ -10,6 +9,8 @@ interface NoteRepository {
     fun getAllSelectedNotes(): Observable<List<SelectedNote>>
     fun getNoteById(id: String): Observable<StickyNote>
     fun putNote(stickyNote: StickyNote)
+
+    fun updateNote(noteId: String, attributes: List<NoteAttribute>)
     fun createNote(stickyNote: StickyNote)
     fun deleteNote(noteId: String)
 

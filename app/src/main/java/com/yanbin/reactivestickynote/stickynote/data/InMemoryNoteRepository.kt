@@ -1,6 +1,8 @@
 package com.yanbin.reactivestickynote.stickynote.data
 
 import com.yanbin.reactivestickynote.account.Account
+import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
+import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
@@ -18,6 +20,10 @@ class InMemoryNoteRepository: NoteRepository {
     override fun putNote(stickyNote: StickyNote) {
         noteMap[stickyNote.id] = stickyNote
         sendNotesUpdateSignal()
+    }
+
+    override fun updateNote(noteId: String, attributes: List<NoteAttribute>) {
+        TODO("Not yet implemented")
     }
 
     override fun createNote(note: StickyNote) {
