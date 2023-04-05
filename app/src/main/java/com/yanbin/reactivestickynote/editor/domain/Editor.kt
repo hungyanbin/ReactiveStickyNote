@@ -72,10 +72,6 @@ class Editor(
         noteRepository.deleteNote(id)
     }
 
-    fun updateNote(stickyNote: StickyNote) {
-        noteRepository.putNote(stickyNote)
-    }
-
     fun navigateToEditTextPage(stickyNote: StickyNote) {
         openEditTextScreenSignal.onNext(stickyNote)
     }

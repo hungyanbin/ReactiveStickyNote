@@ -8,8 +8,6 @@ interface NoteRepository {
     fun getAllVisibleNoteIds(): Observable<List<String>>
     fun getAllSelectedNotes(): Observable<List<SelectedNote>>
     fun getNoteById(id: String): Observable<StickyNote>
-    fun putNote(stickyNote: StickyNote)
-
     fun updateNote(noteId: String, attributes: List<NoteAttribute>)
     fun createNote(stickyNote: StickyNote)
     fun deleteNote(noteId: String)

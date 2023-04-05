@@ -89,10 +89,6 @@ class FirebaseNoteRepository : NoteRepository {
         setNoteDocument(note)
     }
 
-    override fun putNote(stickyNote: StickyNote) {
-        updatingNoteSubject.onNext(Optional.of(stickyNote))
-    }
-
     override fun updateNote(noteId: String, attributes: List<NoteAttribute>) {
         TODO("Not yet implemented")
     }

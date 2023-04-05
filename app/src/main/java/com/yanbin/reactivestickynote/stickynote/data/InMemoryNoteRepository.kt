@@ -17,13 +17,9 @@ class InMemoryNoteRepository: NoteRepository {
     private val selectedNotes = BehaviorSubject.createDefault(emptyList<SelectedNote>())
     private val selectedNoteMap = ConcurrentHashMap<String, SelectedNote>()
 
-    override fun putNote(stickyNote: StickyNote) {
-        noteMap[stickyNote.id] = stickyNote
-        sendNotesUpdateSignal()
-    }
-
     override fun updateNote(noteId: String, attributes: List<NoteAttribute>) {
-        TODO("Not yet implemented")
+        noteMap[noteId] = UpdatedNoteAttributes.fromAttributes(noteId, attributes).updateNote(noteMap[noteId]!!)
+        sendNotesUpdateSignal()
     }
 
     override fun createNote(note: StickyNote) {

@@ -2,6 +2,7 @@ package com.yanbin.reactivestickynote.edittext
 
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -30,11 +31,12 @@ class EditTextViewModel(
     fun onConfirmClicked() {
         noteRepository.getNoteById(noteId)
             .withLatestFrom(text) { note, text ->
-                note.copy(text = text)
+                note.id to text
             }
             .firstElement()
-            .subscribe { newNote ->
-                noteRepository.putNote(stickyNote = newNote)
+            .subscribe { (id, text) ->
+                val attribute = NoteAttribute.Text(text)
+                noteRepository.updateNote(id, listOf(attribute))
                 leavePageSubject.onNext(Unit)
             }
             .addTo(disposableBag)

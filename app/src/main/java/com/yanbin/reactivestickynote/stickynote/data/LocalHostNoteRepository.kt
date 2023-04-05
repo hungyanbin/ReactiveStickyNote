@@ -175,28 +175,6 @@ class LocalHostNoteRepository: NoteRepository {
         allNotesSubject.onNext(currentNotes)
     }
 
-    override fun putNote(stickyNote: StickyNote) {
-//        selectedNotesSubject.onNext(
-//            listOf(SelectedNote(stickyNote.id, "Yachu"))
-//        )
-//        coroutineScope.launch(Dispatchers.IO) {
-//            clientWebSocketSession?.sendSerialized(
-//                SocketMessage(
-//                    SocketMessage.Type.Update,
-//                    objectId = stickyNote.id,
-//                    content = SocketMessage.Attribute.NewPosition to YBPointF(
-//                        stickyNote.position.x,
-//                        stickyNote.position.y
-//                    )
-//                )
-//            )
-//        }
-//        val currentNotes = allNotesSubject.value?.toMutableList() ?: return
-//        val updatedIndex = currentNotes.indexOfFirst { it.id == stickyNote.id }
-//        currentNotes[updatedIndex] = stickyNote
-//        allNotesSubject.onNext(currentNotes)
-    }
-
     override fun createNote(stickyNote: StickyNote) {
 
     }

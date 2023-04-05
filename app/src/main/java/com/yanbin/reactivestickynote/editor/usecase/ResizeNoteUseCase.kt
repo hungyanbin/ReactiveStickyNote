@@ -3,6 +3,7 @@ package com.yanbin.reactivestickynote.editor.usecase
 import com.yanbin.common.YBSize
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -21,20 +22,21 @@ class ResizeNoteUseCase(
 
         deltaObservable.withLatestFrom(editor.userSelectedNote, noteObservable) { (widthDelta, heightDelta), optSelectedNote, note ->
             doOnUserSelectedNote(optSelectedNote, note) {
-                changeNoteSizeWithConstraint(note, widthDelta, heightDelta)
+                note.id to changeNoteSizeWithConstraint(note, widthDelta, heightDelta)
             }
         }
             .mapOptional { it }
-            .subscribe { note ->
-                editor.updateNote(note)
+            .subscribe { (id, size) ->
+                val attribute = NoteAttribute.Size(size)
+                noteRepository.updateNote(id, listOf(attribute))
             }
             .addTo(disposableBag)
     }
 
-    private fun changeNoteSizeWithConstraint(note: StickyNote, widthDelta: Float, heightDelta: Float): StickyNote {
+    private fun changeNoteSizeWithConstraint(note: StickyNote, widthDelta: Float, heightDelta: Float): YBSize {
         val currentSize = note.size
         val newWidth = (currentSize.width + widthDelta).coerceAtLeast(StickyNote.MIN_SIZE)
         val newHeight = (currentSize.height + heightDelta).coerceAtLeast(StickyNote.MIN_SIZE)
-        return note.copy(size = YBSize(newWidth, newHeight))
+        return YBSize(newWidth, newHeight)
     }
 }
