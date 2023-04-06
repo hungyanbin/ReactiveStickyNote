@@ -2,6 +2,7 @@ package com.yanbin.reactivestickynote.editor.usecase
 
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 

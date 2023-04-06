@@ -2,6 +2,7 @@ package com.yanbin.reactivestickynote.edittext
 
 import androidx.lifecycle.ViewModel
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable

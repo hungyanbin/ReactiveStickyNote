@@ -11,18 +11,18 @@ fun <R> doOnUserSelectedNote(
     action: () -> R
 ): Optional<R> {
     // Consider to change behavior
-    return Optional.ofNullable(action())
-//    return userSelectedNote.fold(
-//        someFun = { selectedNote ->
-//            // Can move
-//            if (selectedNote.noteId == targetNote.id) {
-//                action()
-//            } else {
-//                null
-//            }
-//        },
-//        emptyFun = {
-//            null
-//        }
-//    ).let { Optional.ofNullable(it) }
+//    return Optional.ofNullable(action())
+    return userSelectedNote.fold(
+        someFun = { selectedNote ->
+            // Can move
+            if (selectedNote.noteId == targetNote.id) {
+                action()
+            } else {
+                null
+            }
+        },
+        emptyFun = {
+            null
+        }
+    ).let { Optional.ofNullable(it) }
 }

@@ -2,6 +2,7 @@ package com.yanbin.reactivestickynote.editor.domain
 
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -61,11 +62,6 @@ class Editor(
 
     fun getNoteById(id: String): Observable<StickyNote> {
         return noteRepository.getNoteById(id)
-    }
-
-    fun addNewNote() {
-        val newNote = StickyNote.createRandomNote()
-        noteRepository.createNote(newNote)
     }
 
     fun removeNote(id: String) {

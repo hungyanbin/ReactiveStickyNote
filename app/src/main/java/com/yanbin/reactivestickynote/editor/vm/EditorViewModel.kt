@@ -1,10 +1,12 @@
 package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.editor.usecase.*
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 
@@ -14,6 +16,7 @@ class EditorViewModel(
 ): ViewModel() {
 
     private val tapCanvasSubject = PublishSubject.create<Unit>()
+    private val tapCreateSubject = PublishSubject.create<Unit>()
 
     val openEditTextScreen: Observable<StickyNote> = editor.openEditTextScreen
     val showContextMenu = editor.isContextMenuShown
@@ -38,10 +41,14 @@ class EditorViewModel(
             start(editor, noteRepository)
             useCases.add(this)
         }
+        AddNoteUseCae(tapCreateSubject, viewModelScope).apply {
+            start(editor, noteRepository)
+            useCases.add(this)
+        }
     }
 
     fun addNewNote() {
-        editor.addNewNote()
+        tapCreateSubject.onNext(Unit)
     }
 
     fun tapCanvas() {

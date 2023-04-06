@@ -2,11 +2,12 @@ package com.yanbin.reactivestickynote.stickynote.data
 
 import com.yanbin.reactivestickynote.account.Account
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
-import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -22,7 +23,7 @@ class InMemoryNoteRepository: NoteRepository {
         sendNotesUpdateSignal()
     }
 
-    override fun createNote(note: StickyNote) {
+    override suspend fun createNote(note: StickyNote) = withContext(Dispatchers.IO) {
         noteMap[note.id] = note
         sendNotesUpdateSignal()
     }
