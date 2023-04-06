@@ -3,7 +3,6 @@ package com.yanbin.reactivestickynote.edittext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -11,6 +10,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asObservable
 
 class EditTextViewModel(
     private val noteRepository: NoteRepository,
@@ -32,7 +32,7 @@ class EditTextViewModel(
     val leavePage: Observable<Unit> = leavePageSubject.hide()
 
     fun onConfirmClicked() {
-        noteRepository.getNoteById(noteId)
+        noteRepository.getNoteById(noteId).asObservable()
             .withLatestFrom(text) { note, text ->
                 note.id to text
             }

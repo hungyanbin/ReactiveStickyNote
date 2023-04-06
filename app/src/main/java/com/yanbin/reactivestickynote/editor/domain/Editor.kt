@@ -2,11 +2,11 @@ package com.yanbin.reactivestickynote.editor.domain
 
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.rx3.asObservable
 import java.util.*
 
 class Editor(
@@ -18,7 +18,7 @@ class Editor(
     private val _showAddButton = BehaviorSubject.createDefault(true)
     private val openEditTextScreenSignal = PublishSubject.create<StickyNote>()
 
-    val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes()
+    val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes().asObservable()
     val isContextMenuShown: Observable<Boolean> = _showContextMenu.hide()
     val isAddButtonShown: Observable<Boolean> = _showAddButton.hide()
 
@@ -61,7 +61,7 @@ class Editor(
     }
 
     fun getNoteById(id: String): Observable<StickyNote> {
-        return noteRepository.getNoteById(id)
+        return noteRepository.getNoteById(id).asObservable()
     }
 
     fun navigateToEditTextPage(stickyNote: StickyNote) {

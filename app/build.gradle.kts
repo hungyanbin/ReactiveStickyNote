@@ -67,6 +67,7 @@ dependencies {
     implementation(Dependencies.RxJava.rxJava)
     implementation(Dependencies.RxJava.rxAndroid)
     implementation(Dependencies.RxJava.rxKotlin)
+    implementation(Dependencies.RxJava.coroutineRx)
     // Firebase
     implementation(platform(Dependencies.Firebase.bom))
     implementation (Dependencies.Firebase.firestore)

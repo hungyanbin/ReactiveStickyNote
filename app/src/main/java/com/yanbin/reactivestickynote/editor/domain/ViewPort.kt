@@ -1,17 +1,17 @@
 package com.yanbin.reactivestickynote.editor.domain
 
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.Position
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.rx3.asObservable
 
 class ViewPort(noteRepository: NoteRepository) {
 
     private val _center = BehaviorSubject.createDefault(Position(0f, 0f))
     private val _scale = BehaviorSubject.createDefault(1f)
 
-    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
+    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds().asObservable()
     val scale: Observable<Float> = _scale.hide()
     val center: Observable<Position> = _center.hide()
 
