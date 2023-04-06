@@ -7,12 +7,15 @@ import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.reactivestickynote.stickynote.model.Position
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 // Pair for noteId and position delta
 typealias NotePositionDelta = Pair<String, Position>
 
 class MoveNoteUseCase(
-    private val noteMoveObservable: Observable<NotePositionDelta>
+    private val noteMoveObservable: Observable<NotePositionDelta>,
+    private val scope: CoroutineScope
 ): BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
@@ -27,8 +30,10 @@ class MoveNoteUseCase(
         }
             .mapOptional { it }
             .subscribe { (noteId, newPosition) ->
-                val attribute = NoteAttribute.Pos(newPosition)
-                noteRepository.updateNote(noteId, listOf(attribute))
+                scope.launch {
+                    val attribute = NoteAttribute.Pos(newPosition)
+                    noteRepository.updateNote(noteId, listOf(attribute))
+                }
             }
             .addTo(disposableBag)
     }

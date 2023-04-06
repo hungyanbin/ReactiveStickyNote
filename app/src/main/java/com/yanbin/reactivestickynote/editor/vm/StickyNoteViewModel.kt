@@ -1,6 +1,7 @@
 package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.Position
@@ -24,15 +25,15 @@ class StickyNoteViewModel(
     private val useCases = mutableListOf<BaseEditorUseCase>()
 
     init {
-        MoveNoteUseCase(moveNoteSubject.hide()).apply {
+        MoveNoteUseCase(moveNoteSubject.hide(), viewModelScope).apply {
             start(editor, noteRepository)
             useCases.add(this)
         }
-        ResizeNoteUseCase(resizeNoteSubject.hide()).apply {
+        ResizeNoteUseCase(resizeNoteSubject.hide(), viewModelScope).apply {
             start(editor, noteRepository)
             useCases.add(this)
         }
-        TapNoteUseCae(accountService, tapNoteSubject.hide()).apply {
+        TapNoteUseCae(accountService, tapNoteSubject.hide(), viewModelScope).apply {
             start(editor, noteRepository)
             useCases.add(this)
         }

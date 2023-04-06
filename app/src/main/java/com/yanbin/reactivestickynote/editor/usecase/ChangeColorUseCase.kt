@@ -7,8 +7,12 @@ import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.utils.filterInstance
 import io.reactivex.rxjava3.kotlin.addTo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class ChangeColorUseCase : BaseEditorUseCase() {
+class ChangeColorUseCase(
+    private val scope: CoroutineScope
+) : BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
         editor.contextMenu
@@ -20,8 +24,10 @@ class ChangeColorUseCase : BaseEditorUseCase() {
                 }
             }.mapOptional { it }
             .subscribe { (id, color) ->
-                val attribute = NoteAttribute.Color(color)
-                noteRepository.updateNote(id, listOf(attribute))
+                scope.launch {
+                    val attribute = NoteAttribute.Color(color)
+                    noteRepository.updateNote(id, listOf(attribute))
+                }
             }
             .addTo(disposableBag)
     }

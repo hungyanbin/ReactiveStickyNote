@@ -42,11 +42,11 @@ class Editor(
     val contextMenu = ContextMenu(selectedStickyNote)
     val viewPort = ViewPort(noteRepository)
 
-    fun setNoteSelected(id: String) {
+    suspend fun setNoteSelected(id: String) {
         noteRepository.setNoteSelection(id, accountService.getCurrentAccount())
     }
 
-    fun setNoteUnSelected(id: String) {
+    suspend fun setNoteUnSelected(id: String) {
         noteRepository.removeNoteSelection(id, accountService.getCurrentAccount())
     }
 
@@ -62,10 +62,6 @@ class Editor(
 
     fun getNoteById(id: String): Observable<StickyNote> {
         return noteRepository.getNoteById(id)
-    }
-
-    fun removeNote(id: String) {
-        noteRepository.deleteNote(id)
     }
 
     fun navigateToEditTextPage(stickyNote: StickyNote) {

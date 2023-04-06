@@ -10,10 +10,10 @@ interface NoteRepository {
     fun getAllVisibleNoteIds(): Observable<List<String>>
     fun getAllSelectedNotes(): Observable<List<SelectedNote>>
     fun getNoteById(id: String): Observable<StickyNote>
-    fun updateNote(noteId: String, attributes: List<NoteAttribute>)
+    suspend fun updateNote(noteId: String, attributes: List<NoteAttribute>)
     suspend fun createNote(stickyNote: StickyNote)
-    fun deleteNote(noteId: String)
+    suspend fun deleteNote(noteId: String)
 
-    fun setNoteSelection(noteId: String, account: Account)
-    fun removeNoteSelection(noteId: String, account: Account)
+    suspend fun setNoteSelection(noteId: String, account: Account)
+    suspend fun removeNoteSelection(noteId: String, account: Account)
 }

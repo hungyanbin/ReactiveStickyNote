@@ -8,12 +8,15 @@ import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 // Triple for noteId, widthDelta and heightDelta
 typealias NoteSizeDelta = Triple<String, Float, Float>
 
 class ResizeNoteUseCase(
-    private val noteResizeObservable: Observable<NoteSizeDelta>
+    private val noteResizeObservable: Observable<NoteSizeDelta>,
+    private val scope: CoroutineScope
 ): BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
@@ -28,8 +31,10 @@ class ResizeNoteUseCase(
         }
             .mapOptional { it }
             .subscribe { (id, size) ->
-                val attribute = NoteAttribute.Size(size)
-                noteRepository.updateNote(id, listOf(attribute))
+                scope.launch {
+                    val attribute = NoteAttribute.Size(size)
+                    noteRepository.updateNote(id, listOf(attribute))
+                }
             }
             .addTo(disposableBag)
     }

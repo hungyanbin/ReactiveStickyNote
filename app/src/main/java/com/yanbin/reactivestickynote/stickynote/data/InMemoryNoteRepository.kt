@@ -18,7 +18,7 @@ class InMemoryNoteRepository: NoteRepository {
     private val selectedNotes = BehaviorSubject.createDefault(emptyList<SelectedNote>())
     private val selectedNoteMap = ConcurrentHashMap<String, SelectedNote>()
 
-    override fun updateNote(noteId: String, attributes: List<NoteAttribute>) {
+    override suspend fun updateNote(noteId: String, attributes: List<NoteAttribute>) = withContext(Dispatchers.IO) {
         noteMap[noteId] = UpdatedNoteAttributes.fromAttributes(noteId, attributes).updateNote(noteMap[noteId]!!)
         sendNotesUpdateSignal()
     }
@@ -28,7 +28,7 @@ class InMemoryNoteRepository: NoteRepository {
         sendNotesUpdateSignal()
     }
 
-    override fun deleteNote(noteId: String) {
+    override suspend fun deleteNote(noteId: String) = withContext(Dispatchers.IO) {
         noteMap.remove(noteId)
         sendNotesUpdateSignal()
     }
@@ -47,12 +47,12 @@ class InMemoryNoteRepository: NoteRepository {
         return selectedNotes.hide()
     }
 
-    override fun setNoteSelection(noteId: String, account: Account) {
+    override suspend fun setNoteSelection(noteId: String, account: Account) = withContext(Dispatchers.IO) {
         selectedNoteMap[account.id] = SelectedNote(noteId, account.userName)
         sendSelectedNotesUpdateSignal()
     }
 
-    override fun removeNoteSelection(noteId: String, account: Account) {
+    override suspend fun removeNoteSelection(noteId: String, account: Account) = withContext(Dispatchers.IO) {
         selectedNoteMap.remove(account.id)
         sendSelectedNotesUpdateSignal()
     }

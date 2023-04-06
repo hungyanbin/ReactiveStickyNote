@@ -25,11 +25,11 @@ class EditorViewModel(
     private val useCases: MutableList<BaseEditorUseCase> = mutableListOf()
 
     init {
-        DeleteNoteUseCase().apply {
+        DeleteNoteUseCase(viewModelScope).apply {
             start(editor, noteRepository)
             useCases.add(this)
         }
-        ChangeColorUseCase().apply {
+        ChangeColorUseCase(viewModelScope).apply {
             start(editor, noteRepository)
             useCases.add(this)
         }
@@ -37,7 +37,7 @@ class EditorViewModel(
             start(editor, noteRepository)
             useCases.add(this)
         }
-        TapCanvasUseCae(tapCanvasSubject.hide()).apply {
+        TapCanvasUseCae(tapCanvasSubject.hide(), viewModelScope).apply {
             start(editor, noteRepository)
             useCases.add(this)
         }

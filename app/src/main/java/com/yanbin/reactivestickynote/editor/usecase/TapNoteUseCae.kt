@@ -7,26 +7,31 @@ import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class TapNoteUseCae(
     private val accountService: AccountService,
-    private val tapNoteObservable: Observable<String>
+    private val tapNoteObservable: Observable<String>,
+    private val scope: CoroutineScope
 ): BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
         tapNoteObservable.withLatestFrom(editor.selectedNotes) { id, selectedNotes ->
                 id to selectedNotes
             }.subscribe { (id, selectedNotes) ->
-                if (isNoteSelecting(id, selectedNotes)) {
-                    if (isSelectedByUser(id, selectedNotes)) {
-                        editor.setNoteUnSelected(id)
-                        editor.showAddButton()
+                scope.launch {
+                    if (isNoteSelecting(id, selectedNotes)) {
+                        if (isSelectedByUser(id, selectedNotes)) {
+                            editor.setNoteUnSelected(id)
+                            editor.showAddButton()
+                        } else {
+                            // can not select other user's note
+                        }
                     } else {
-                        // can not select other user's note
+                        editor.setNoteSelected(id)
+                        editor.showContextMenu()
                     }
-                } else {
-                    editor.setNoteSelected(id)
-                    editor.showContextMenu()
                 }
             }
             .addTo(disposableBag)
