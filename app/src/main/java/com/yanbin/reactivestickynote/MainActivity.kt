@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,11 +12,10 @@ import com.yanbin.reactivestickynote.edittext.EditTextViewModel
 import com.yanbin.reactivestickynote.login.LoginScreen
 import com.yanbin.reactivestickynote.login.LoginViewModel
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
-import com.yanbin.reactivestickynote.ui.route.EditTextScreen
+import com.yanbin.reactivestickynote.edittext.EditTextScreen
 import com.yanbin.reactivestickynote.editor.view.EditorScreen
 import com.yanbin.reactivestickynote.ui.route.Screen
 import com.yanbin.reactivestickynote.ui.theme.ReactiveStickyNoteTheme
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
