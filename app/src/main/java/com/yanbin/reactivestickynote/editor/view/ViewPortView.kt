@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rxjava3.subscribeAsState
@@ -20,9 +21,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 @Composable
 fun StatefulViewPortView() {
     val viewPortViewModel by LocalViewModelStoreOwner.current!!.viewModel<ViewPortViewModel>()
-    val scale by viewPortViewModel.scale.subscribeAsState(initial = 0f)
-    val center by viewPortViewModel.center.subscribeAsState(initial = Position(0f, 0f))
-    val noteIds by viewPortViewModel.allVisibleNoteIds.subscribeAsState(initial = emptyList())
+    val scale by viewPortViewModel.scale.collectAsState(initial = 0f)
+    val center by viewPortViewModel.center.collectAsState(initial = Position(0f, 0f))
+    val noteIds by viewPortViewModel.allVisibleNoteIds.collectAsState(initial = emptyList())
 
     ViewPortView(
         noteIds = noteIds,
