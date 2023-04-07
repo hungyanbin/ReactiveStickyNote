@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,6 +18,8 @@ import com.yanbin.reactivestickynote.ui.route.EditTextScreen
 import com.yanbin.reactivestickynote.editor.view.EditorScreen
 import com.yanbin.reactivestickynote.ui.route.Screen
 import com.yanbin.reactivestickynote.ui.theme.ReactiveStickyNoteTheme
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -27,14 +31,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            ReactiveStickyNoteTheme {
-                val accountService by inject<AccountService>()
-                val startDestination = if (accountService.hasAccount()) {
+            val accountService by inject<AccountService>()
+            val startDestination = runBlocking {
+                if (accountService.hasAccount()) {
                     Screen.Editor.route
                 } else {
                     Screen.Login.route
                 }
+            }
 
+            ReactiveStickyNoteTheme {
                 NavHost(navController, startDestination = startDestination) {
                     composable(Screen.Login.route) {
                         val viewModel by viewModel<LoginViewModel>()

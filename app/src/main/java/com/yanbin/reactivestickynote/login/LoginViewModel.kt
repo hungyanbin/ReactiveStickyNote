@@ -1,13 +1,13 @@
 package com.yanbin.reactivestickynote.login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yanbin.reactivestickynote.account.AccountService
-import com.yanbin.utils.fromIO
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val accountService: AccountService
@@ -27,12 +27,10 @@ class LoginViewModel(
 
     fun onEnterClicked() {
         val name = _text.value ?: return
-        accountService.createAccount(name)
-            .fromIO()
-            .subscribe { _ ->
-                _toEditorPage.onNext(Unit)
-            }
-            .addTo(disposableBag)
+        viewModelScope.launch {
+            accountService.createAccount(name)
+            _toEditorPage.onNext(Unit)
+        }
     }
 
     override fun onCleared() {

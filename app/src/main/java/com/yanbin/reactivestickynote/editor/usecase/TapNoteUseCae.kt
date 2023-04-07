@@ -41,7 +41,7 @@ class TapNoteUseCae(
         return selectedNotes.any { it.noteId == id }
     }
 
-    private fun isSelectedByUser(id: String, selectedNotes: List<SelectedNote>): Boolean {
+    private suspend fun isSelectedByUser(id: String, selectedNotes: List<SelectedNote>): Boolean {
         return selectedNotes.find { selectedNote -> selectedNote.userName == accountService.getCurrentAccount().userName }
             ?.let { selectedNote -> selectedNote.noteId == id } ?: false
     }

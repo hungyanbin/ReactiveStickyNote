@@ -6,6 +6,7 @@ import com.yanbin.reactivestickynote.stickynote.model.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx3.asObservable
 import java.util.*
 
@@ -23,7 +24,11 @@ class Editor(
     val isAddButtonShown: Observable<Boolean> = _showAddButton.hide()
 
     val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
-        Optional.ofNullable(notes.find { note -> note.userName == accountService.getCurrentAccount().userName })
+        Optional.ofNullable(notes.find { note ->
+            note.userName == runBlocking {
+                accountService.getCurrentAccount().userName
+            }
+        })
     }.startWithItem(Optional.empty<SelectedNote>())
 
     // State
