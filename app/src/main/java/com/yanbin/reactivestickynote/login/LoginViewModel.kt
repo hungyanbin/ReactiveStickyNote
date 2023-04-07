@@ -7,6 +7,10 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
@@ -15,22 +19,20 @@ class LoginViewModel(
 
     private val disposableBag = CompositeDisposable()
 
-    private val _text = BehaviorSubject.createDefault("")
-    val text: Observable<String> = _text.hide()
+    private val _textFlow = MutableStateFlow("")
+    val textFlow: StateFlow<String> = _textFlow
 
-    private val _toEditorPage = PublishSubject.create<Unit>()
-    val toEditorPage: Observable<Unit> = _toEditorPage.hide()
+    private val _toEditorPageFlow = MutableSharedFlow<Unit>()
+    val toEditorPageFlow: SharedFlow<Unit> = _toEditorPageFlow
 
-    fun onTextChanged(text: String) {
-        _text.onNext(text)
+    fun onTextChanged(text: String) = viewModelScope.launch {
+        _textFlow.emit(text)
     }
 
-    fun onEnterClicked() {
-        val name = _text.value ?: return
-        viewModelScope.launch {
-            accountService.createAccount(name)
-            _toEditorPage.onNext(Unit)
-        }
+    fun onEnterClicked() = viewModelScope.launch {
+        val name = textFlow.value
+        accountService.createAccount(name)
+        _toEditorPageFlow.emit(Unit)
     }
 
     override fun onCleared() {
