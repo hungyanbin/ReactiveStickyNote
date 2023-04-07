@@ -5,15 +5,11 @@ import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.utils.mapOptional
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 
-class ChangeColorUseCase(
-    private val scope: CoroutineScope
-) : BaseEditorUseCase() {
-
-    override fun start(editor: Editor, noteRepository: NoteRepository) {
-        editor.contextMenu
+class ChangeColorUseCase {
+    fun startFlow(editor: Editor, noteRepository: NoteRepository): Flow<Any> {
+        return editor.contextMenu
             .contextMenuEvents
             .filterIsInstance<ContextMenuEvent.ChangeColor>()
             .map { event ->
@@ -25,6 +21,5 @@ class ChangeColorUseCase(
                 val attribute = NoteAttribute.Color(color)
                 noteRepository.updateNote(id, listOf(attribute))
             }
-            .launchIn(scope)
     }
 }

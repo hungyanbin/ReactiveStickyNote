@@ -11,6 +11,7 @@ import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.rx3.asObservable
 
 class StickyNoteViewModel(
@@ -22,21 +23,11 @@ class StickyNoteViewModel(
     private val moveNoteSubject = PublishSubject.create<NotePositionDelta>()
     private val resizeNoteSubject = PublishSubject.create<NoteSizeDelta>()
     private val tapNoteSubject = PublishSubject.create<String>()
-    private val useCases = mutableListOf<BaseEditorUseCase>()
 
     init {
-        MoveNoteUseCase(moveNoteSubject.hide(), viewModelScope).apply {
-            start(editor, noteRepository)
-            useCases.add(this)
-        }
-        ResizeNoteUseCase(resizeNoteSubject.hide(), viewModelScope).apply {
-            start(editor, noteRepository)
-            useCases.add(this)
-        }
-        TapNoteUseCae(accountService, tapNoteSubject.hide(), viewModelScope).apply {
-            start(editor, noteRepository)
-            useCases.add(this)
-        }
+        MoveNoteUseCase(moveNoteSubject.hide()).startFlow(editor, noteRepository).launchIn(viewModelScope)
+        ResizeNoteUseCase(resizeNoteSubject.hide()).startFlow(editor, noteRepository).launchIn(viewModelScope)
+        TapNoteUseCae(accountService, tapNoteSubject.hide()).startFlow(editor).launchIn(viewModelScope)
     }
 
     fun moveNote(noteId: String, positionDelta: Position) {
@@ -62,8 +53,4 @@ class StickyNoteViewModel(
             }
         }
         .distinctUntilChanged()
-
-    override fun onCleared() {
-        useCases.forEach { it.stop() }
-    }
 }
