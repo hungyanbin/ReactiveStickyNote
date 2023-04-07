@@ -3,13 +3,10 @@ package com.yanbin.reactivestickynote.editor.usecase
 import com.yanbin.reactivestickynote.editor.domain.ContextMenuEvent
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
-import com.yanbin.utils.filterInstance
-import io.reactivex.rxjava3.kotlin.addTo
+import com.yanbin.utils.mapOptional
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.asObservable
+import kotlinx.coroutines.flow.*
 
 class ChangeColorUseCase(
     private val scope: CoroutineScope
@@ -18,19 +15,16 @@ class ChangeColorUseCase(
     override fun start(editor: Editor, noteRepository: NoteRepository) {
         editor.contextMenu
             .contextMenuEvents
-            .asObservable()
-            .filterInstance<ContextMenuEvent.ChangeColor>()
-            .withLatestFrom(editor.selectedStickyNote) { event, optSelectedNote ->
-                optSelectedNote.map { note ->
-                    note.id to event.color
-                }
-            }.mapOptional { it }
-            .subscribe { (id, color) ->
-                scope.launch {
-                    val attribute = NoteAttribute.Color(color)
-                    noteRepository.updateNote(id, listOf(attribute))
-                }
+            .filterIsInstance<ContextMenuEvent.ChangeColor>()
+            .map { event ->
+                val optSelectedNote = editor.selectedStickyNote.first()
+                optSelectedNote.map { it.id to event.color }
             }
-            .addTo(disposableBag)
+            .mapOptional { it }
+            .onEach { (id, color) ->
+                val attribute = NoteAttribute.Color(color)
+                noteRepository.updateNote(id, listOf(attribute))
+            }
+            .launchIn(scope)
     }
 }

@@ -11,6 +11,7 @@ import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.rx3.asObservable
 
 class StickyNoteViewModel(
     private val editor: Editor,
@@ -50,7 +51,7 @@ class StickyNoteViewModel(
         tapNoteSubject.onNext(id)
     }
 
-    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(editor.getNoteById(id), editor.selectedNotes, editor.userSelectedNote)
+    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(editor.getNoteById(id).asObservable(), editor.selectedNotes.asObservable(), editor.userSelectedNote.asObservable())
         .map { (note, selectedNotes, userSelectedNote) ->
             val selectedNote = selectedNotes.find { it.noteId == note.id }
             if (selectedNote != null) {

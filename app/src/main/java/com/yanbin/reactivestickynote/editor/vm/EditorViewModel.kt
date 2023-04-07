@@ -6,9 +6,8 @@ import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.editor.usecase.*
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.SharedFlow
 
 class EditorViewModel(
     private val editor: Editor,
@@ -18,7 +17,7 @@ class EditorViewModel(
     private val tapCanvasSubject = PublishSubject.create<Unit>()
     private val tapCreateSubject = PublishSubject.create<Unit>()
 
-    val openEditTextScreen: Observable<StickyNote> = editor.openEditTextScreen
+    val openEditTextScreen: SharedFlow<StickyNote> = editor.openEditTextScreen
     val showContextMenu = editor.isContextMenuShown
     val showAddButton = editor.isAddButtonShown
 
@@ -33,7 +32,7 @@ class EditorViewModel(
             start(editor, noteRepository)
             useCases.add(this)
         }
-        EditTextUseCase().apply {
+        EditTextUseCase(viewModelScope).apply {
             start(editor, noteRepository)
             useCases.add(this)
         }
@@ -57,6 +56,7 @@ class EditorViewModel(
 
     override fun onCleared() {
         useCases.forEach { it.stop() }
+        editor.onDestroy()
     }
 
 }

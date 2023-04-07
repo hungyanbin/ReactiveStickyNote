@@ -8,7 +8,12 @@ import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asFlow
 
 class TapNoteUseCae(
     private val accountService: AccountService,
@@ -17,24 +22,22 @@ class TapNoteUseCae(
 ): BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
-        tapNoteObservable.withLatestFrom(editor.selectedNotes) { id, selectedNotes ->
-                id to selectedNotes
-            }.subscribe { (id, selectedNotes) ->
-                scope.launch {
-                    if (isNoteSelecting(id, selectedNotes)) {
-                        if (isSelectedByUser(id, selectedNotes)) {
-                            editor.setNoteUnSelected(id)
-                            editor.showAddButton()
-                        } else {
-                            // can not select other user's note
-                        }
+        tapNoteObservable.asFlow()
+            .map { id -> id to editor.selectedNotes.first() }
+            .onEach { (id, selectedNotes) ->
+                if (isNoteSelecting(id, selectedNotes)) {
+                    if (isSelectedByUser(id, selectedNotes)) {
+                        editor.setNoteUnSelected(id)
+                        editor.showAddButton()
                     } else {
-                        editor.setNoteSelected(id)
-                        editor.showContextMenu()
+                        // can not select other user's note
                     }
+                } else {
+                    editor.setNoteSelected(id)
+                    editor.showContextMenu()
                 }
             }
-            .addTo(disposableBag)
+            .launchIn(scope)
     }
 
     private fun isNoteSelecting(id: String, selectedNotes: List<SelectedNote>): Boolean {

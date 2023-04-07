@@ -11,8 +11,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -21,8 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.yanbin.reactivestickynote.R
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
-import com.yanbin.utils.subscribeBy
-import com.yanbin.utils.toMain
+import com.yanbin.utils.collectOnLifecycleStarted
 
 @ExperimentalAnimationApi
 @Composable
@@ -30,9 +29,7 @@ fun EditorScreen(
     viewModel: EditorViewModel,
     openEditTextScreen: (StickyNote) -> Unit
 ) {
-    viewModel.openEditTextScreen
-        .toMain()
-        .subscribeBy (onNext = openEditTextScreen)
+    viewModel.openEditTextScreen.collectOnLifecycleStarted(action = openEditTextScreen)
 
     Surface(color = MaterialTheme.colors.background) {
         Box(
@@ -42,8 +39,8 @@ fun EditorScreen(
                     detectTapGestures { viewModel.tapCanvas() }
                 }
         ) {
-            val showContextMenu by viewModel.showContextMenu.subscribeAsState(initial = false)
-            val showAddButton by viewModel.showAddButton.subscribeAsState(initial = true)
+            val showContextMenu by viewModel.showContextMenu.collectAsState(initial = false)
+            val showAddButton by viewModel.showAddButton.collectAsState(initial = true)
 
             StatefulViewPortView()
 

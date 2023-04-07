@@ -7,7 +7,10 @@ import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asFlow
 
 class AddNoteUseCae(
     private val tapAddObservable: Observable<Unit>,
@@ -15,11 +18,11 @@ class AddNoteUseCae(
 ): BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
-        tapAddObservable.subscribe {
-            val newNote = StickyNote.createRandomNote()
-            coroutineScope.launch {
+        tapAddObservable.asFlow()
+            .onEach {
+                val newNote = StickyNote.createRandomNote()
                 noteRepository.createNote(newNote)
             }
-        }.addTo(disposableBag)
+            .launchIn(coroutineScope)
     }
 }

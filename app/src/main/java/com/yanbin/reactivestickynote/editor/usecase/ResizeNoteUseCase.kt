@@ -3,13 +3,16 @@ package com.yanbin.reactivestickynote.editor.usecase
 import com.yanbin.common.YBSize
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
+import com.yanbin.utils.mapOptional
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.kotlin.addTo
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.rx3.asFlow
 
 // Triple for noteId, widthDelta and heightDelta
 typealias NoteSizeDelta = Triple<String, Float, Float>
@@ -20,23 +23,21 @@ class ResizeNoteUseCase(
 ): BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
-        val noteObservable = noteResizeObservable
-            .switchMap { (noteId) -> editor.getNoteById(noteId) }
-        val deltaObservable = noteResizeObservable.map { (_, widthDelta, heightDelta) -> widthDelta to heightDelta }
+        noteResizeObservable.asFlow()
+            .map { (noteId, widthDelta, heightDelta) ->
+                val note = editor.getNoteById(noteId).first()
+                val optSelectedNote = editor.userSelectedNote.first()
 
-        deltaObservable.withLatestFrom(editor.userSelectedNote, noteObservable) { (widthDelta, heightDelta), optSelectedNote, note ->
-            doOnUserSelectedNote(optSelectedNote, note) {
-                note.id to changeNoteSizeWithConstraint(note, widthDelta, heightDelta)
-            }
-        }
-            .mapOptional { it }
-            .subscribe { (id, size) ->
-                scope.launch {
-                    val attribute = NoteAttribute.Size(size)
-                    noteRepository.updateNote(id, listOf(attribute))
+                doOnUserSelectedNote(optSelectedNote, note) {
+                    note.id to changeNoteSizeWithConstraint(note, widthDelta, heightDelta)
                 }
             }
-            .addTo(disposableBag)
+            .mapOptional { it }
+            .onEach { (id, size) ->
+                val attribute = NoteAttribute.Size(size)
+                noteRepository.updateNote(id, listOf(attribute))
+            }
+            .launchIn(scope)
     }
 
     private fun changeNoteSizeWithConstraint(note: StickyNote, widthDelta: Float, heightDelta: Float): YBSize {

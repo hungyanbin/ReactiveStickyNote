@@ -2,13 +2,17 @@ package com.yanbin.reactivestickynote.editor.usecase
 
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.reactivestickynote.stickynote.model.Position
+import com.yanbin.utils.mapOptional
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.kotlin.addTo
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asFlow
 
 // Pair for noteId and position delta
 typealias NotePositionDelta = Pair<String, Position>
@@ -19,22 +23,21 @@ class MoveNoteUseCase(
 ): BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
-        val noteObservable = noteMoveObservable
-            .switchMap { (noteId, _) -> editor.getNoteById(noteId) }
-        val deltaObservable = noteMoveObservable.map { (_, delta) -> delta }
-
-        deltaObservable.withLatestFrom(editor.userSelectedNote, noteObservable) { delta, optSelectedNote, note ->
-            doOnUserSelectedNote(optSelectedNote, note) {
-                note.id to note.position + delta
+        noteMoveObservable.asFlow()
+            .map { (noteId, delta) ->
+                val note = editor.getNoteById(noteId).first()
+                val optSelectedNote = editor.userSelectedNote.first()
+                doOnUserSelectedNote(optSelectedNote, note) {
+                    note.id to note.position + delta
+                }
             }
-        }
             .mapOptional { it }
-            .subscribe { (noteId, newPosition) ->
+            .onEach { (noteId, newPosition) ->
                 scope.launch {
                     val attribute = NoteAttribute.Pos(newPosition)
                     noteRepository.updateNote(noteId, listOf(attribute))
                 }
             }
-            .addTo(disposableBag)
+            .launchIn(scope)
     }
 }

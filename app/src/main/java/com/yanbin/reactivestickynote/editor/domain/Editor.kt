@@ -3,12 +3,13 @@ package com.yanbin.reactivestickynote.editor.domain
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.*
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
-import io.reactivex.rxjava3.subjects.PublishSubject
+import com.yanbin.utils.fold
+import com.yanbin.utils.toOptional
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.rx3.asFlow
-import kotlinx.coroutines.rx3.asObservable
 import java.util.*
 
 class Editor(
@@ -16,36 +17,43 @@ class Editor(
     private val accountService: AccountService
 ) {
 
-    private val _showContextMenu = BehaviorSubject.createDefault(false)
-    private val _showAddButton = BehaviorSubject.createDefault(true)
-    private val openEditTextScreenSignal = PublishSubject.create<StickyNote>()
+    private val _showContextMenu = MutableStateFlow(false)
+    private val _showAddButton = MutableStateFlow(true)
+    private val openEditTextScreenSignal = MutableSharedFlow<StickyNote>()
+    private val editorScope = CoroutineScope(Dispatchers.Default)
 
-    val selectedNotes: Observable<List<SelectedNote>> = noteRepository.getAllSelectedNotes().asObservable()
-    val isContextMenuShown: Observable<Boolean> = _showContextMenu.hide()
-    val isAddButtonShown: Observable<Boolean> = _showAddButton.hide()
+    val selectedNotes: SharedFlow<List<SelectedNote>> = noteRepository.getAllSelectedNotes().shareIn(editorScope, SharingStarted.Lazily, replay = 1)
+    val isContextMenuShown: StateFlow<Boolean> = _showContextMenu.asStateFlow()
+    val isAddButtonShown: StateFlow<Boolean> = _showAddButton.asStateFlow()
 
-    val userSelectedNote: Observable<Optional<SelectedNote>> = selectedNotes.map { notes ->
+    val userSelectedNote: SharedFlow<Optional<SelectedNote>> = selectedNotes.map { notes ->
         Optional.ofNullable(notes.find { note ->
             note.userName == runBlocking {
                 accountService.getCurrentAccount().userName
             }
         })
-    }.startWithItem(Optional.empty<SelectedNote>())
+    }.onStart { emit(Optional.empty()) }
+        .shareIn(editorScope, SharingStarted.Lazily, replay = 1)
 
     // State
-    val selectedStickyNote: Observable<Optional<StickyNote>> = userSelectedNote
-        .switchMap { optSelectedNote ->
-            if (optSelectedNote.isPresent) {
-                getNoteById(optSelectedNote.get().noteId)
-                    .map { Optional.ofNullable(it) }
-            } else {
-                Observable.just(Optional.empty())
-            }
+    val selectedStickyNote: SharedFlow<Optional<StickyNote>> = userSelectedNote
+        .flatMapLatest { optSelectedNote ->
+            optSelectedNote.fold(
+                someFun = { note ->
+                    getNoteById(note.noteId)
+                        .map { it.toOptional() }
+                },
+                emptyFun = {
+                    flowOf(Optional.empty())
+                }
+            )
         }
-    val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.hide()
+        .shareIn(editorScope, SharingStarted.Lazily, replay = 1)
+
+    val openEditTextScreen: SharedFlow<StickyNote> = openEditTextScreenSignal.asSharedFlow()
 
     // Component
-    val contextMenu = ContextMenu(selectedStickyNote.asFlow())
+    val contextMenu = ContextMenu(selectedStickyNote)
     val viewPort = ViewPort(noteRepository)
 
     suspend fun setNoteSelected(id: String) {
@@ -56,22 +64,26 @@ class Editor(
         noteRepository.removeNoteSelection(id, accountService.getCurrentAccount())
     }
 
-    fun showAddButton() {
-        _showAddButton.onNext(true)
-        _showContextMenu.onNext(false)
+    suspend fun showAddButton() {
+        _showAddButton.emit(true)
+        _showContextMenu.emit(false)
     }
 
-    fun showContextMenu() {
-        _showAddButton.onNext(false)
-        _showContextMenu.onNext(true)
+    suspend fun showContextMenu() {
+        _showAddButton.emit(false)
+        _showContextMenu.emit(true)
     }
 
-    fun getNoteById(id: String): Observable<StickyNote> {
-        return noteRepository.getNoteById(id).asObservable()
+    fun getNoteById(id: String): Flow<StickyNote> {
+        return noteRepository.getNoteById(id)
     }
 
-    fun navigateToEditTextPage(stickyNote: StickyNote) {
-        openEditTextScreenSignal.onNext(stickyNote)
+    suspend fun navigateToEditTextPage(stickyNote: StickyNote) {
+        openEditTextScreenSignal.emit(stickyNote)
+    }
+
+    fun onDestroy() {
+        editorScope.cancel()
     }
 
 }
