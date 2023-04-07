@@ -12,8 +12,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -42,7 +42,7 @@ fun StatefulStickyNoteView(
         stickyNoteViewModel.onChangeSize(id, deltaX, deltaY)
     }
 
-    val noteUiModel by stickyNoteViewModel.getNoteById(id).subscribeAsState(initial = StickyNoteUiModel.emptyUiModel(id))
+    val noteUiModel by stickyNoteViewModel.getNoteById(id).collectAsState(initial = StickyNoteUiModel.emptyUiModel(id))
 
     StickyNoteView(
         modifier = modifier,

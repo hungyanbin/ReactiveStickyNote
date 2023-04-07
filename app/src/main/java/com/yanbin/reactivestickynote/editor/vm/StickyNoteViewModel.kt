@@ -8,12 +8,8 @@ import com.yanbin.reactivestickynote.editor.usecase.*
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.utils.fold
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.kotlin.Observables
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.asObservable
 
 class StickyNoteViewModel(
     private val editor: Editor,
@@ -43,8 +39,8 @@ class StickyNoteViewModel(
         tapNoteFlow.emit(id)
     }
 
-    fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(editor.getNoteById(id).asObservable(), editor.selectedNotes.asObservable(), editor.userSelectedNote.asObservable())
-        .map { (note, selectedNotes, userSelectedNote) ->
+    fun getNoteById(id: String): Flow<StickyNoteUiModel> = combine(editor.getNoteById(id), editor.selectedNotes, editor.userSelectedNote)
+         { note, selectedNotes, userSelectedNote ->
             val selectedNote = selectedNotes.find { it.noteId == note.id }
             if (selectedNote != null) {
                 val isCurrentUser = userSelectedNote.fold(someFun = { it.noteId == note.id }, emptyFun = { false })
@@ -54,4 +50,5 @@ class StickyNoteViewModel(
             }
         }
         .distinctUntilChanged()
+
 }

@@ -3,12 +3,10 @@ package com.yanbin.reactivestickynote.editor.usecase
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.reactivestickynote.stickynote.model.SelectedNote
-import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.rx3.asFlow
 
 class TapNoteUseCae(
     private val accountService: AccountService,

@@ -3,10 +3,7 @@ package com.yanbin.reactivestickynote.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yanbin.reactivestickynote.account.AccountService
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
-import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
