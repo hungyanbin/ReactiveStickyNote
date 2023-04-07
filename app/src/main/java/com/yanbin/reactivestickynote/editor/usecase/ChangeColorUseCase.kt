@@ -9,6 +9,7 @@ import com.yanbin.utils.filterInstance
 import io.reactivex.rxjava3.kotlin.addTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asObservable
 
 class ChangeColorUseCase(
     private val scope: CoroutineScope
@@ -17,6 +18,7 @@ class ChangeColorUseCase(
     override fun start(editor: Editor, noteRepository: NoteRepository) {
         editor.contextMenu
             .contextMenuEvents
+            .asObservable()
             .filterInstance<ContextMenuEvent.ChangeColor>()
             .withLatestFrom(editor.selectedStickyNote) { event, optSelectedNote ->
                 optSelectedNote.map { note ->

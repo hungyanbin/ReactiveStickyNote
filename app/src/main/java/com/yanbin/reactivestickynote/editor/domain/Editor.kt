@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx3.asFlow
 import kotlinx.coroutines.rx3.asObservable
 import java.util.*
 
@@ -44,7 +45,7 @@ class Editor(
     val openEditTextScreen: Observable<StickyNote> = openEditTextScreenSignal.hide()
 
     // Component
-    val contextMenu = ContextMenu(selectedStickyNote)
+    val contextMenu = ContextMenu(selectedStickyNote.asFlow())
     val viewPort = ViewPort(noteRepository)
 
     suspend fun setNoteSelected(id: String) {

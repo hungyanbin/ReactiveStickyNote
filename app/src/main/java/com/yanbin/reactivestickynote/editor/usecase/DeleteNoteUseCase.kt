@@ -7,6 +7,7 @@ import com.yanbin.utils.filterInstance
 import io.reactivex.rxjava3.kotlin.addTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asObservable
 
 class DeleteNoteUseCase(
     private val scope: CoroutineScope
@@ -15,6 +16,7 @@ class DeleteNoteUseCase(
     override fun start(editor: Editor, noteRepository: NoteRepository) {
         editor.contextMenu
             .contextMenuEvents
+            .asObservable()
             .filterInstance<ContextMenuEvent.DeleteNote>()
             .withLatestFrom(editor.userSelectedNote) { _, optSelectedNote ->
                 optSelectedNote.map { note ->

@@ -6,12 +6,14 @@ import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.stickynote.data.OldNoteRepository
 import com.yanbin.utils.filterInstance
 import io.reactivex.rxjava3.kotlin.addTo
+import kotlinx.coroutines.rx3.asObservable
 
 class EditTextUseCase : BaseEditorUseCase() {
 
     override fun start(editor: Editor, noteRepository: NoteRepository) {
         editor.contextMenu
             .contextMenuEvents
+            .asObservable()
             .filterInstance<ContextMenuEvent.NavigateToEditTextPage>()
             .withLatestFrom(editor.selectedStickyNote) { _, selectedNote -> selectedNote}
             .mapOptional { it }

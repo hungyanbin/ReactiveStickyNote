@@ -1,8 +1,10 @@
 package com.yanbin.reactivestickynote.editor.vm
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yanbin.reactivestickynote.editor.domain.ContextMenu
 import com.yanbin.reactivestickynote.stickynote.model.YBColor
+import kotlinx.coroutines.launch
 
 class ContextMenuViewModel(
     private val contextMenu: ContextMenu
@@ -11,15 +13,15 @@ class ContextMenuViewModel(
     val selectedColor = contextMenu.selectedColor
     val colorOptions = contextMenu.colorOptions
 
-    fun onDeleteClicked() {
+    fun onDeleteClicked() = viewModelScope.launch {
         contextMenu.onDeleteClicked()
     }
 
-    fun onColorSelected(color: YBColor) {
+    fun onColorSelected(color: YBColor) = viewModelScope.launch {
         contextMenu.onColorSelected(color)
     }
 
-    fun onEditTextClicked() {
+    fun onEditTextClicked() = viewModelScope.launch {
         contextMenu.onEditTextClicked()
     }
 }
