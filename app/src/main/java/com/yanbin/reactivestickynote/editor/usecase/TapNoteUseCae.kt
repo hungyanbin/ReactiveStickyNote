@@ -12,11 +12,11 @@ import kotlinx.coroutines.rx3.asFlow
 
 class TapNoteUseCae(
     private val accountService: AccountService,
-    private val tapNoteObservable: Observable<String>
+    private val tapNoteFlow: Flow<String>
 ) {
 
     fun startFlow(editor: Editor): Flow<Any> {
-        return tapNoteObservable.asFlow()
+        return tapNoteFlow
             .map { id -> id to editor.selectedNotes.first() }
             .onEach { (id, selectedNotes) ->
                 if (isNoteSelecting(id, selectedNotes)) {

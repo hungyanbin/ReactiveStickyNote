@@ -6,8 +6,6 @@ import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.NoteAttribute
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.utils.mapOptional
-import io.reactivex.rxjava3.core.Observable
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.rx3.asFlow
 
@@ -15,11 +13,11 @@ import kotlinx.coroutines.rx3.asFlow
 typealias NoteSizeDelta = Triple<String, Float, Float>
 
 class ResizeNoteUseCase(
-    private val noteResizeObservable: Observable<NoteSizeDelta>,
+    private val noteResizeFlow: Flow<NoteSizeDelta>,
 ) {
 
     fun startFlow(editor: Editor, noteRepository: NoteRepository): Flow<Any> {
-        return noteResizeObservable.asFlow()
+        return noteResizeFlow
             .map { (noteId, widthDelta, heightDelta) ->
                 val note = editor.getNoteById(noteId).first()
                 val optSelectedNote = editor.userSelectedNote.first()

@@ -2,16 +2,17 @@ package com.yanbin.reactivestickynote.editor.usecase
 
 import com.yanbin.reactivestickynote.editor.domain.Editor
 import com.yanbin.utils.mapOptional
-import io.reactivex.rxjava3.core.Observable
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.rx3.asFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 class TapCanvasUseCae(
-    private val tapCanvasObservable: Observable<Unit>,
+    private val tapCanvasFlow: Flow<Unit>,
 ) {
 
     fun startFlow(editor: Editor): Flow<Any> {
-        return tapCanvasObservable.asFlow()
+        return tapCanvasFlow
             .map { editor.userSelectedNote.first() }
             .mapOptional { it }
             .onEach { selectedNote ->

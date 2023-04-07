@@ -4,14 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yanbin.reactivestickynote.account.AccountService
 import com.yanbin.reactivestickynote.editor.domain.Editor
-import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.reactivestickynote.editor.usecase.*
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
+import com.yanbin.reactivestickynote.stickynote.model.Position
 import com.yanbin.utils.fold
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
-import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.asObservable
 
 class StickyNoteViewModel(
@@ -20,26 +21,26 @@ class StickyNoteViewModel(
     private val accountService: AccountService
 ): ViewModel() {
 
-    private val moveNoteSubject = PublishSubject.create<NotePositionDelta>()
-    private val resizeNoteSubject = PublishSubject.create<NoteSizeDelta>()
-    private val tapNoteSubject = PublishSubject.create<String>()
+    private val moveNoteFlow = MutableSharedFlow<NotePositionDelta>()
+    private val resizeNoteFlow = MutableSharedFlow<NoteSizeDelta>()
+    private val tapNoteFlow = MutableSharedFlow<String>()
 
     init {
-        MoveNoteUseCase(moveNoteSubject.hide()).startFlow(editor, noteRepository).launchIn(viewModelScope)
-        ResizeNoteUseCase(resizeNoteSubject.hide()).startFlow(editor, noteRepository).launchIn(viewModelScope)
-        TapNoteUseCae(accountService, tapNoteSubject.hide()).startFlow(editor).launchIn(viewModelScope)
+        MoveNoteUseCase(moveNoteFlow).startFlow(editor, noteRepository).launchIn(viewModelScope)
+        ResizeNoteUseCase(resizeNoteFlow).startFlow(editor, noteRepository).launchIn(viewModelScope)
+        TapNoteUseCae(accountService, tapNoteFlow).startFlow(editor).launchIn(viewModelScope)
     }
 
-    fun moveNote(noteId: String, positionDelta: Position) {
-        moveNoteSubject.onNext(noteId to positionDelta)
+    fun moveNote(noteId: String, positionDelta: Position) = viewModelScope.launch {
+        moveNoteFlow.emit(noteId to positionDelta)
     }
 
-    fun onChangeSize(noteId: String, widthDelta: Float, heightDelta: Float) {
-        resizeNoteSubject.onNext(Triple(noteId, widthDelta, heightDelta))
+    fun onChangeSize(noteId: String, widthDelta: Float, heightDelta: Float) = viewModelScope.launch {
+        resizeNoteFlow.emit(Triple(noteId, widthDelta, heightDelta))
     }
 
-    fun tapNote(id: String) {
-        tapNoteSubject.onNext(id)
+    fun tapNote(id: String) = viewModelScope.launch {
+        tapNoteFlow.emit(id)
     }
 
     fun getNoteById(id: String): Observable<StickyNoteUiModel> = Observables.combineLatest(editor.getNoteById(id).asObservable(), editor.selectedNotes.asObservable(), editor.userSelectedNote.asObservable())
