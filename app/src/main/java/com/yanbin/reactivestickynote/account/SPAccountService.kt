@@ -2,6 +2,8 @@ package com.yanbin.reactivestickynote.account
 
 import android.content.Context
 import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class SPAccountService(
@@ -17,31 +19,28 @@ class SPAccountService(
     private val sharedPreferences = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
     private var account: Account? = null
 
-    override fun createAccount(name: String): Single<Account> {
-        return Single.fromCallable {
-            val accountId = UUID.randomUUID().toString()
-            sharedPreferences.edit()
-                .putString(SP_KEY_ACCOUNT_NAME, name)
-                .putString(SP_KEY_ACCOUNT_ID, accountId)
-                .apply()
+    override suspend fun createAccount(name: String): Account = withContext(Dispatchers.IO) {
+        val accountId = UUID.randomUUID().toString()
+        sharedPreferences.edit()
+            .putString(SP_KEY_ACCOUNT_NAME, name)
+            .putString(SP_KEY_ACCOUNT_ID, accountId)
+            .apply()
 
-            account = Account(name, accountId)
-            account!!
-        }
+        Account(name, accountId).also { account = it }
     }
 
-    override fun getCurrentAccount(): Account {
+    override suspend fun getCurrentAccount(): Account = withContext(Dispatchers.IO) {
         if (account == null) {
             val accountId = sharedPreferences.getString(SP_KEY_ACCOUNT_ID, "") ?: ""
             val name = sharedPreferences.getString(SP_KEY_ACCOUNT_NAME, "") ?: ""
             account = Account(name, accountId)
         }
 
-        return account!!
+        account!!
     }
 
-    override fun hasAccount(): Boolean {
+    override suspend fun hasAccount(): Boolean = withContext(Dispatchers.IO) {
         val accountId = sharedPreferences.getString(SP_KEY_ACCOUNT_ID, "") ?: ""
-        return accountId.isNotEmpty()
+        accountId.isNotEmpty()
     }
 }

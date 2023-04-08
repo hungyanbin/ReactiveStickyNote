@@ -18,7 +18,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.protobuf.ProtoBuf
 import java.util.*
 
-class LocalHostNoteRepository: NoteRepository {
+class LocalHostNoteRepository: OldNoteRepository {
 
     private val allNotesSubject = BehaviorSubject.create<List<StickyNote>>()
     private val selectedNotesSubject = BehaviorSubject.createDefault(listOf(SelectedNote("", "")))

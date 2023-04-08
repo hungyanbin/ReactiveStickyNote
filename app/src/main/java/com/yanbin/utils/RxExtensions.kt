@@ -43,3 +43,7 @@ fun <T, R> Optional<T>.fold(someFun: (T) -> R, emptyFun: () -> R): R {
         emptyFun()
     }
 }
+
+fun <T: Any> T.toOptional(): Optional<T> {
+    return Optional.of(this)
+}

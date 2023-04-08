@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.subjects.Subject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class FirebaseNoteRepository : NoteRepository {
+class FirebaseNoteRepository : OldNoteRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val allNoteIdsSubject = BehaviorSubject.create<List<String>>()

@@ -29,6 +29,7 @@ object Dependencies {
         const val rxJava = "io.reactivex.rxjava3:rxjava:3.0.12"
         const val rxAndroid = "io.reactivex.rxjava3:rxandroid:3.0.0"
         const val rxKotlin = "io.reactivex.rxjava3:rxkotlin:3.0.0"
+        const val coroutineRx = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.3.9"
     }
 
     object Firebase {

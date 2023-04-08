@@ -2,21 +2,19 @@ package com.yanbin.reactivestickynote.editor.usecase
 
 import com.yanbin.reactivestickynote.editor.domain.ContextMenuEvent
 import com.yanbin.reactivestickynote.editor.domain.Editor
-import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
-import com.yanbin.utils.filterInstance
-import io.reactivex.rxjava3.kotlin.addTo
+import com.yanbin.utils.mapOptional
+import kotlinx.coroutines.flow.*
 
-class EditTextUseCase : BaseEditorUseCase() {
+class EditTextUseCase {
 
-    override fun start(editor: Editor, noteRepository: NoteRepository) {
-        editor.contextMenu
+    fun startFlow(editor: Editor): Flow<Any> {
+        return editor.contextMenu
             .contextMenuEvents
-            .filterInstance<ContextMenuEvent.NavigateToEditTextPage>()
-            .withLatestFrom(editor.selectedStickyNote) { _, selectedNote -> selectedNote}
+            .filterIsInstance<ContextMenuEvent.NavigateToEditTextPage>()
+            .map { editor.selectedStickyNote.first() }
             .mapOptional { it }
-            .subscribe { stickyNote ->
+            .onEach { stickyNote ->
                 editor.navigateToEditTextPage(stickyNote)
             }
-            .addTo(disposableBag)
     }
 }

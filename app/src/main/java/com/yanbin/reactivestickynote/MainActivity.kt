@@ -12,10 +12,11 @@ import com.yanbin.reactivestickynote.edittext.EditTextViewModel
 import com.yanbin.reactivestickynote.login.LoginScreen
 import com.yanbin.reactivestickynote.login.LoginViewModel
 import com.yanbin.reactivestickynote.editor.vm.EditorViewModel
-import com.yanbin.reactivestickynote.ui.route.EditTextScreen
+import com.yanbin.reactivestickynote.edittext.EditTextScreen
 import com.yanbin.reactivestickynote.editor.view.EditorScreen
 import com.yanbin.reactivestickynote.ui.route.Screen
 import com.yanbin.reactivestickynote.ui.theme.ReactiveStickyNoteTheme
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -27,14 +28,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            ReactiveStickyNoteTheme {
-                val accountService by inject<AccountService>()
-                val startDestination = if (accountService.hasAccount()) {
+            val accountService by inject<AccountService>()
+            val startDestination = runBlocking {
+                if (accountService.hasAccount()) {
                     Screen.Editor.route
                 } else {
                     Screen.Login.route
                 }
+            }
 
+            ReactiveStickyNoteTheme {
                 NavHost(navController, startDestination = startDestination) {
                     composable(Screen.Login.route) {
                         val viewModel by viewModel<LoginViewModel>()

@@ -1,12 +1,10 @@
 package com.yanbin.reactivestickynote.account
 
-import io.reactivex.rxjava3.core.Single
-
 interface AccountService {
 
-    fun createAccount(name: String): Single<Account>
+    suspend fun createAccount(name: String): Account
 
-    fun getCurrentAccount(): Account
+    suspend fun getCurrentAccount(): Account
 
-    fun hasAccount(): Boolean
+    suspend fun hasAccount(): Boolean
 }

@@ -1,4 +1,4 @@
-package com.yanbin.reactivestickynote.ui.route
+package com.yanbin.reactivestickynote.edittext
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,27 +10,24 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.yanbin.reactivestickynote.R
-import com.yanbin.reactivestickynote.edittext.EditTextViewModel
 import com.yanbin.reactivestickynote.ui.theme.TransparentBlack
-import com.yanbin.utils.subscribeBy
-import com.yanbin.utils.toMain
+import com.yanbin.utils.collectOnLifecycleStarted
 
 @Composable
 fun EditTextScreen(
     editTextViewModel: EditTextViewModel,
     onLeaveScreen: () -> Unit,
 ) {
-    val text by editTextViewModel.text.subscribeAsState(initial = "")
-    editTextViewModel.leavePage
-        .toMain()
-        .subscribeBy( onNext = { onLeaveScreen() })
+    val text by editTextViewModel.textFlow.collectAsState(initial = "")
+
+    editTextViewModel.leavePageFlow.collectOnLifecycleStarted { onLeaveScreen() }
 
     Box(modifier = Modifier
         .fillMaxSize()

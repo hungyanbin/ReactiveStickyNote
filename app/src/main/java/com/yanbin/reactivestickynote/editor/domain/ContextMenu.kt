@@ -2,34 +2,37 @@ package com.yanbin.reactivestickynote.editor.domain
 
 import com.yanbin.reactivestickynote.stickynote.model.StickyNote
 import com.yanbin.reactivestickynote.stickynote.model.YBColor
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.PublishSubject
+import com.yanbin.utils.mapOptional
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.map
 import java.util.*
 
 class ContextMenu(
-    private val selectedNote: Observable<Optional<StickyNote>>
+    private val selectedNote: Flow<Optional<StickyNote>>
 ) {
 
-    private val _contextMenuEvents = PublishSubject.create<ContextMenuEvent>()
+    private val _contextMenuEvents = MutableSharedFlow<ContextMenuEvent>()
 
     val colorOptions: List<YBColor> = YBColor.defaultColors
 
-    val selectedColor: Observable<YBColor> = selectedNote
+    val selectedColor: Flow<YBColor> = selectedNote
         .mapOptional { it }
         .map { it.color }
 
-    val contextMenuEvents: Observable<ContextMenuEvent> = _contextMenuEvents.hide()
+    val contextMenuEvents: SharedFlow<ContextMenuEvent> = _contextMenuEvents
 
-    fun onColorSelected(color: YBColor) {
-        _contextMenuEvents.onNext(ContextMenuEvent.ChangeColor(color))
+    suspend fun onColorSelected(color: YBColor) {
+        _contextMenuEvents.emit(ContextMenuEvent.ChangeColor(color))
     }
 
-    fun onDeleteClicked() {
-        _contextMenuEvents.onNext(ContextMenuEvent.DeleteNote)
+    suspend fun onDeleteClicked() {
+        _contextMenuEvents.emit(ContextMenuEvent.DeleteNote)
     }
 
-    fun onEditTextClicked() {
-        _contextMenuEvents.onNext(ContextMenuEvent.NavigateToEditTextPage)
+    suspend fun onEditTextClicked() {
+        _contextMenuEvents.emit(ContextMenuEvent.NavigateToEditTextPage)
     }
 
 }

@@ -2,21 +2,22 @@ package com.yanbin.reactivestickynote.editor.domain
 
 import com.yanbin.reactivestickynote.stickynote.data.NoteRepository
 import com.yanbin.reactivestickynote.stickynote.model.Position
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class ViewPort(noteRepository: NoteRepository) {
 
-    private val _center = BehaviorSubject.createDefault(Position(0f, 0f))
-    private val _scale = BehaviorSubject.createDefault(1f)
+    private val _center = MutableStateFlow(Position(0f, 0f))
+    private val _scale = MutableStateFlow(1f)
 
-    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
-    val scale: Observable<Float> = _scale.hide()
-    val center: Observable<Position> = _center.hide()
+    val allVisibleNoteIds: Flow<List<String>> = noteRepository.getAllVisibleNoteIds()
+    val scale: StateFlow<Float> = _scale
+    val center: StateFlow<Position> = _center
 
-    fun transformDelta(position: Position, scale: Float) {
-        _center.onNext(position + _center.value!!)
-        _scale.onNext((scale * _scale.value!!).coerceIn(MIN_SCALE, MAX_SCALE))
+    suspend fun transformDelta(position: Position, scale: Float) {
+        _center.emit(position + _center.value)
+        _scale.emit((scale * _scale.value).coerceIn(MIN_SCALE, MAX_SCALE))
     }
 
     companion object {
